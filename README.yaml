@@ -133,8 +133,6 @@ description: |-
   - [datadog_logs_archive resource]
     (https://registry.terraform.io/providers/DataDog/datadog/latest/docs/resources/logs_archive) - Datadog's provider
     documentation for the datadog_logs_archive resource
-include:
-  - "docs/terraform.md"
 tags:
   - component/datadog-logs-archive
   - layer/datadog
