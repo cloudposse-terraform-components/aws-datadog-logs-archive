@@ -159,7 +159,7 @@ data "aws_partition" "current" {
 
 module "archive_bucket" {
   source  = "cloudposse/s3-bucket/aws"
-  version = "3.1.2"
+  version = "3.1.3"
 
   count = local.enabled ? 1 : 0
 
@@ -218,7 +218,7 @@ module "archive_bucket" {
 
 module "cloudtrail_s3_bucket" {
   source  = "cloudposse/s3-bucket/aws"
-  version = "3.1.2"
+  version = "3.1.3"
 
   depends_on = [data.aws_iam_policy_document.default]
 
