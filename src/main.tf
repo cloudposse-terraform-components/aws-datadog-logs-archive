@@ -140,7 +140,9 @@ module "bucket_policy" {
   source  = "cloudposse/iam-policy/aws"
   version = "1.0.1"
 
-  iam_policy_statements = try(lookup(local.policy, "Statement"), null)
+  iam_policy = local.enabled ? {
+    statements = local.policy.Statement
+  } : null
 
   context = module.this.context
 }
