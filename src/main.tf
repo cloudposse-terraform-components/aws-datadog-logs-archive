@@ -140,7 +140,9 @@ module "bucket_policy" {
   source  = "cloudposse/iam-policy/aws"
   version = "1.0.1"
 
-  iam_policy_statements = try(lookup(local.policy, "Statement"), null)
+  iam_policy = local.enabled ? {
+    statements = local.policy.Statement
+  } : null
 
   context = module.this.context
 }
@@ -166,6 +168,9 @@ module "archive_bucket" {
   acl           = "private"
   enabled       = local.enabled
   force_destroy = var.s3_force_destroy
+
+  kms_master_key_arn = module.kms_key_archive.key_arn
+  sse_algorithm      = "aws:kms"
 
   lifecycle_rules = [
     {
@@ -218,7 +223,7 @@ module "archive_bucket" {
 
 module "cloudtrail_s3_bucket" {
   source  = "cloudposse/s3-bucket/aws"
-  version = "3.1.2"
+  version = "4.10.0"
 
   depends_on = [data.aws_iam_policy_document.default]
 
@@ -228,6 +233,9 @@ module "cloudtrail_s3_bucket" {
   acl           = "private"
   enabled       = local.enabled
   force_destroy = var.s3_force_destroy
+
+  kms_master_key_arn = module.kms_key_archive.key_arn
+  sse_algorithm      = "aws:kms"
 
   source_policy_documents = data.aws_iam_policy_document.default.*.json
 
@@ -239,8 +247,8 @@ module "cloudtrail_s3_bucket" {
 
       abort_incomplete_multipart_upload_days         = null
       enable_glacier_transition                      = var.enable_glacier_transition
-      glacier_transition_days                        = 365
-      noncurrent_version_glacier_transition_days     = 365
+      glacier_transition_days                        = var.glacier_transition_days
+      noncurrent_version_glacier_transition_days     = var.glacier_transition_days
       enable_deeparchive_transition                  = false
       deeparchive_transition_days                    = 0
       noncurrent_version_deeparchive_transition_days = 0
@@ -302,6 +310,7 @@ module "cloudtrail" {
   enabled                       = local.enabled
   enable_logging                = true
   s3_bucket_name                = module.cloudtrail_s3_bucket[0].bucket_id
+  kms_key_arn                   = module.kms_key_archive.key_arn
 
   event_selector = [
     {
