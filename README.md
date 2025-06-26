@@ -315,7 +315,7 @@ Copyright © 2017-2025 [Cloud Posse, LLC](https://cpco.io/copyright)
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.9.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.9.0, < 6.0.0 |
 | <a name="requirement_datadog"></a> [datadog](#requirement\_datadog) | >= 3.19 |
 | <a name="requirement_http"></a> [http](#requirement\_http) | >= 2.1.0 |
 
@@ -323,7 +323,7 @@ Copyright © 2017-2025 [Cloud Posse, LLC](https://cpco.io/copyright)
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.9.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.9.0, < 6.0.0 |
 | <a name="provider_datadog"></a> [datadog](#provider\_datadog) | >= 3.19 |
 | <a name="provider_http"></a> [http](#provider\_http) | >= 2.1.0 |
 
