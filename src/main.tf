@@ -173,15 +173,15 @@ module "archive_bucket" {
       enabled = var.lifecycle_rules_enabled
       tags    = {}
 
-      abort_incomplete_multipart_upload_days         = null
+      abort_incomplete_multipart_upload_days         = var.abort_incomplete_multipart_upload_days
       enable_glacier_transition                      = var.enable_glacier_transition
       glacier_transition_days                        = var.glacier_transition_days
-      noncurrent_version_glacier_transition_days     = 30
-      enable_deeparchive_transition                  = false
-      deeparchive_transition_days                    = 0
-      noncurrent_version_deeparchive_transition_days = 0
-      enable_standard_ia_transition                  = false
-      standard_transition_days                       = 0
+      noncurrent_version_glacier_transition_days     = var.noncurrent_version_glacier_transition_days
+      enable_deeparchive_transition                  = var.enable_deeparchive_transition
+      deeparchive_transition_days                    = var.deeparchive_transition_days
+      noncurrent_version_deeparchive_transition_days = var.noncurrent_version_deeparchive_transition_days
+      enable_standard_ia_transition                  = var.enable_standard_ia_transition
+      standard_transition_days                       = var.standard_transition_days
       enable_current_object_expiration               = var.expiration_days > 0
       expiration_days                                = var.expiration_days
       enable_noncurrent_version_expiration           = var.noncurrent_version_expiration_days > 0
@@ -237,15 +237,15 @@ module "cloudtrail_s3_bucket" {
       enabled = var.lifecycle_rules_enabled
       tags    = {}
 
-      abort_incomplete_multipart_upload_days         = null
+      abort_incomplete_multipart_upload_days         = var.abort_incomplete_multipart_upload_days
       enable_glacier_transition                      = var.enable_glacier_transition
-      glacier_transition_days                        = 365
-      noncurrent_version_glacier_transition_days     = 365
-      enable_deeparchive_transition                  = false
-      deeparchive_transition_days                    = 0
-      noncurrent_version_deeparchive_transition_days = 0
-      enable_standard_ia_transition                  = false
-      standard_transition_days                       = 0
+      glacier_transition_days                        = var.cloudtrail_glacier_transition_days
+      noncurrent_version_glacier_transition_days     = var.cloudtrail_noncurrent_version_glacier_transition_days
+      enable_deeparchive_transition                  = var.enable_deeparchive_transition
+      deeparchive_transition_days                    = var.deeparchive_transition_days
+      noncurrent_version_deeparchive_transition_days = var.noncurrent_version_deeparchive_transition_days
+      enable_standard_ia_transition                  = var.enable_standard_ia_transition
+      standard_transition_days                       = var.standard_transition_days
       enable_current_object_expiration               = var.expiration_days > 0
       expiration_days                                = var.expiration_days
       enable_noncurrent_version_expiration           = var.noncurrent_version_expiration_days > 0

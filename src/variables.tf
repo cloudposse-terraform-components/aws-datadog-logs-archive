@@ -74,3 +74,57 @@ variable "noncurrent_version_expiration_days" {
   description = "Number of days after which to expire noncurrent version objects in S3 bucket. Set to 0 to disable expiration"
   default     = 0
 }
+
+variable "abort_incomplete_multipart_upload_days" {
+  type        = number
+  description = "Number of days after which to abort incomplete multipart uploads. Set to null to disable"
+  default     = null
+}
+
+variable "noncurrent_version_glacier_transition_days" {
+  type        = number
+  description = "Number of days after which to transition noncurrent versions to glacier storage"
+  default     = 30
+}
+
+variable "enable_deeparchive_transition" {
+  type        = bool
+  description = "Enable/disable transition to deep archive storage"
+  default     = false
+}
+
+variable "deeparchive_transition_days" {
+  type        = number
+  description = "Number of days after which to transition objects to deep archive storage"
+  default     = 0
+}
+
+variable "noncurrent_version_deeparchive_transition_days" {
+  type        = number
+  description = "Number of days after which to transition noncurrent versions to deep archive storage"
+  default     = 0
+}
+
+variable "enable_standard_ia_transition" {
+  type        = bool
+  description = "Enable/disable transition to standard IA storage"
+  default     = false
+}
+
+variable "standard_transition_days" {
+  type        = number
+  description = "Number of days after which to transition objects to standard IA storage"
+  default     = 0
+}
+
+variable "cloudtrail_glacier_transition_days" {
+  type        = number
+  description = "Number of days after which to transition cloudtrail objects to glacier storage"
+  default     = 365
+}
+
+variable "cloudtrail_noncurrent_version_glacier_transition_days" {
+  type        = number
+  description = "Number of days after which to transition cloudtrail noncurrent versions to glacier storage"
+  default     = 365
+}
