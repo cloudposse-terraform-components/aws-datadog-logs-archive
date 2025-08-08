@@ -21,17 +21,42 @@ variable "lifecycle_rules_enabled" {
   default     = true
 }
 
-variable "enable_glacier_transition" {
-  type        = bool
-  description = "Enable/disable transition to glacier for log archive bucket. Has no effect unless lifecycle_rules_enabled set to true"
-  default     = true
+variable "archive_lifecycle_config" {
+  type = object({
+    abort_incomplete_multipart_upload_days         = optional(number, null)
+    enable_glacier_transition                      = optional(bool, true)
+    glacier_transition_days                        = optional(number, 365)
+    noncurrent_version_glacier_transition_days     = optional(number, 30)
+    enable_deeparchive_transition                  = optional(bool, false)
+    deeparchive_transition_days                    = optional(number, 0)
+    noncurrent_version_deeparchive_transition_days = optional(number, 0)
+    enable_standard_ia_transition                  = optional(bool, false)
+    standard_transition_days                       = optional(number, 0)
+    expiration_days                                = optional(number, 0)
+    noncurrent_version_expiration_days             = optional(number, 0)
+  })
+  description = "Lifecycle configuration for the archive S3 bucket"
+  default     = {}
 }
 
-variable "glacier_transition_days" {
-  type        = number
-  description = "Number of days after which to transition objects to glacier storage in log archive bucket"
-  default     = 365
+variable "cloudtrail_lifecycle_config" {
+  type = object({
+    abort_incomplete_multipart_upload_days         = optional(number, null)
+    enable_glacier_transition                      = optional(bool, true)
+    glacier_transition_days                        = optional(number, 365)
+    noncurrent_version_glacier_transition_days     = optional(number, 365)
+    enable_deeparchive_transition                  = optional(bool, false)
+    deeparchive_transition_days                    = optional(number, 0)
+    noncurrent_version_deeparchive_transition_days = optional(number, 0)
+    enable_standard_ia_transition                  = optional(bool, false)
+    standard_transition_days                       = optional(number, 0)
+    expiration_days                                = optional(number, 0)
+    noncurrent_version_expiration_days             = optional(number, 0)
+  })
+  description = "Lifecycle configuration for the cloudtrail S3 bucket"
+  default     = {}
 }
+
 
 variable "object_lock_days_archive" {
   type        = number
@@ -63,122 +88,4 @@ variable "s3_force_destroy" {
   default     = false
 }
 
-variable "expiration_days" {
-  type        = number
-  description = "Number of days after which to expire current version objects in S3 bucket. Set to 0 to disable expiration"
-  default     = 0
-}
 
-variable "noncurrent_version_expiration_days" {
-  type        = number
-  description = "Number of days after which to expire noncurrent version objects in S3 bucket. Set to 0 to disable expiration"
-  default     = 0
-}
-
-variable "abort_incomplete_multipart_upload_days" {
-  type        = number
-  description = "Number of days after which to abort incomplete multipart uploads. Set to null to disable"
-  default     = null
-}
-
-variable "noncurrent_version_glacier_transition_days" {
-  type        = number
-  description = "Number of days after which to transition noncurrent versions to glacier storage"
-  default     = 30
-}
-
-variable "enable_deeparchive_transition" {
-  type        = bool
-  description = "Enable/disable transition to deep archive storage"
-  default     = false
-}
-
-variable "deeparchive_transition_days" {
-  type        = number
-  description = "Number of days after which to transition objects to deep archive storage"
-  default     = 0
-}
-
-variable "noncurrent_version_deeparchive_transition_days" {
-  type        = number
-  description = "Number of days after which to transition noncurrent versions to deep archive storage"
-  default     = 0
-}
-
-variable "enable_standard_ia_transition" {
-  type        = bool
-  description = "Enable/disable transition to standard IA storage"
-  default     = false
-}
-
-variable "standard_transition_days" {
-  type        = number
-  description = "Number of days after which to transition objects to standard IA storage"
-  default     = 0
-}
-
-variable "cloudtrail_abort_incomplete_multipart_upload_days" {
-  type        = number
-  description = "Number of days after which to abort incomplete multipart uploads for cloudtrail bucket. Set to null to disable"
-  default     = null
-}
-
-variable "cloudtrail_enable_glacier_transition" {
-  type        = bool
-  description = "Enable/disable transition to glacier for cloudtrail bucket"
-  default     = true
-}
-
-variable "cloudtrail_glacier_transition_days" {
-  type        = number
-  description = "Number of days after which to transition cloudtrail objects to glacier storage"
-  default     = 365
-}
-
-variable "cloudtrail_noncurrent_version_glacier_transition_days" {
-  type        = number
-  description = "Number of days after which to transition cloudtrail noncurrent versions to glacier storage"
-  default     = 365
-}
-
-variable "cloudtrail_enable_deeparchive_transition" {
-  type        = bool
-  description = "Enable/disable transition to deep archive storage for cloudtrail bucket"
-  default     = false
-}
-
-variable "cloudtrail_deeparchive_transition_days" {
-  type        = number
-  description = "Number of days after which to transition cloudtrail objects to deep archive storage"
-  default     = 0
-}
-
-variable "cloudtrail_noncurrent_version_deeparchive_transition_days" {
-  type        = number
-  description = "Number of days after which to transition cloudtrail noncurrent versions to deep archive storage"
-  default     = 0
-}
-
-variable "cloudtrail_enable_standard_ia_transition" {
-  type        = bool
-  description = "Enable/disable transition to standard IA storage for cloudtrail bucket"
-  default     = false
-}
-
-variable "cloudtrail_standard_transition_days" {
-  type        = number
-  description = "Number of days after which to transition cloudtrail objects to standard IA storage"
-  default     = 0
-}
-
-variable "cloudtrail_expiration_days" {
-  type        = number
-  description = "Number of days after which to expire current version cloudtrail objects. Set to 0 to disable expiration"
-  default     = 0
-}
-
-variable "cloudtrail_noncurrent_version_expiration_days" {
-  type        = number
-  description = "Number of days after which to expire noncurrent version cloudtrail objects. Set to 0 to disable expiration"
-  default     = 0
-}
