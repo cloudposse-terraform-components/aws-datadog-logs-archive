@@ -21,17 +21,42 @@ variable "lifecycle_rules_enabled" {
   default     = true
 }
 
-variable "enable_glacier_transition" {
-  type        = bool
-  description = "Enable/disable transition to glacier for log archive bucket. Has no effect unless lifecycle_rules_enabled set to true"
-  default     = true
+variable "archive_lifecycle_config" {
+  type = object({
+    abort_incomplete_multipart_upload_days         = optional(number, null)
+    enable_glacier_transition                      = optional(bool, true)
+    glacier_transition_days                        = optional(number, 365)
+    noncurrent_version_glacier_transition_days     = optional(number, 30)
+    enable_deeparchive_transition                  = optional(bool, false)
+    deeparchive_transition_days                    = optional(number, 0)
+    noncurrent_version_deeparchive_transition_days = optional(number, 0)
+    enable_standard_ia_transition                  = optional(bool, false)
+    standard_transition_days                       = optional(number, 0)
+    expiration_days                                = optional(number, 0)
+    noncurrent_version_expiration_days             = optional(number, 0)
+  })
+  description = "Lifecycle configuration for the archive S3 bucket"
+  default     = {}
 }
 
-variable "glacier_transition_days" {
-  type        = number
-  description = "Number of days after which to transition objects to glacier storage in log archive bucket"
-  default     = 365
+variable "cloudtrail_lifecycle_config" {
+  type = object({
+    abort_incomplete_multipart_upload_days         = optional(number, null)
+    enable_glacier_transition                      = optional(bool, true)
+    glacier_transition_days                        = optional(number, 365)
+    noncurrent_version_glacier_transition_days     = optional(number, 365)
+    enable_deeparchive_transition                  = optional(bool, false)
+    deeparchive_transition_days                    = optional(number, 0)
+    noncurrent_version_deeparchive_transition_days = optional(number, 0)
+    enable_standard_ia_transition                  = optional(bool, false)
+    standard_transition_days                       = optional(number, 0)
+    expiration_days                                = optional(number, 0)
+    noncurrent_version_expiration_days             = optional(number, 0)
+  })
+  description = "Lifecycle configuration for the cloudtrail S3 bucket"
+  default     = {}
 }
+
 
 variable "object_lock_days_archive" {
   type        = number
@@ -62,3 +87,5 @@ variable "s3_force_destroy" {
   description = "Set to true to delete non-empty buckets when enabled is set to false"
   default     = false
 }
+
+
