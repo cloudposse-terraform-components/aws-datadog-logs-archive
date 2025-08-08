@@ -182,10 +182,10 @@ module "archive_bucket" {
       noncurrent_version_deeparchive_transition_days = 0
       enable_standard_ia_transition                  = false
       standard_transition_days                       = 0
-      enable_current_object_expiration               = false
-      expiration_days                                = 0
-      enable_noncurrent_version_expiration           = false
-      noncurrent_version_expiration_days             = 0
+      enable_current_object_expiration               = var.expiration_days > 0
+      expiration_days                                = var.expiration_days
+      enable_noncurrent_version_expiration           = var.noncurrent_version_expiration_days > 0
+      noncurrent_version_expiration_days             = var.noncurrent_version_expiration_days
     },
   ]
 
@@ -246,10 +246,10 @@ module "cloudtrail_s3_bucket" {
       noncurrent_version_deeparchive_transition_days = 0
       enable_standard_ia_transition                  = false
       standard_transition_days                       = 0
-      enable_current_object_expiration               = false
-      expiration_days                                = 0
-      enable_noncurrent_version_expiration           = false
-      noncurrent_version_expiration_days             = 0
+      enable_current_object_expiration               = var.expiration_days > 0
+      expiration_days                                = var.expiration_days
+      enable_noncurrent_version_expiration           = var.noncurrent_version_expiration_days > 0
+      noncurrent_version_expiration_days             = var.noncurrent_version_expiration_days
     },
   ]
 

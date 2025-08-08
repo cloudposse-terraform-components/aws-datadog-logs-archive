@@ -62,3 +62,15 @@ variable "s3_force_destroy" {
   description = "Set to true to delete non-empty buckets when enabled is set to false"
   default     = false
 }
+
+variable "expiration_days" {
+  type        = number
+  description = "Number of days after which to expire current version objects in S3 bucket. Set to 0 to disable expiration"
+  default     = 0
+}
+
+variable "noncurrent_version_expiration_days" {
+  type        = number
+  description = "Number of days after which to expire noncurrent version objects in S3 bucket. Set to 0 to disable expiration"
+  default     = 0
+}
