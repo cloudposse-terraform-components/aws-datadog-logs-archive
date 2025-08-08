@@ -117,6 +117,18 @@ variable "standard_transition_days" {
   default     = 0
 }
 
+variable "cloudtrail_abort_incomplete_multipart_upload_days" {
+  type        = number
+  description = "Number of days after which to abort incomplete multipart uploads for cloudtrail bucket. Set to null to disable"
+  default     = null
+}
+
+variable "cloudtrail_enable_glacier_transition" {
+  type        = bool
+  description = "Enable/disable transition to glacier for cloudtrail bucket"
+  default     = true
+}
+
 variable "cloudtrail_glacier_transition_days" {
   type        = number
   description = "Number of days after which to transition cloudtrail objects to glacier storage"
@@ -127,4 +139,46 @@ variable "cloudtrail_noncurrent_version_glacier_transition_days" {
   type        = number
   description = "Number of days after which to transition cloudtrail noncurrent versions to glacier storage"
   default     = 365
+}
+
+variable "cloudtrail_enable_deeparchive_transition" {
+  type        = bool
+  description = "Enable/disable transition to deep archive storage for cloudtrail bucket"
+  default     = false
+}
+
+variable "cloudtrail_deeparchive_transition_days" {
+  type        = number
+  description = "Number of days after which to transition cloudtrail objects to deep archive storage"
+  default     = 0
+}
+
+variable "cloudtrail_noncurrent_version_deeparchive_transition_days" {
+  type        = number
+  description = "Number of days after which to transition cloudtrail noncurrent versions to deep archive storage"
+  default     = 0
+}
+
+variable "cloudtrail_enable_standard_ia_transition" {
+  type        = bool
+  description = "Enable/disable transition to standard IA storage for cloudtrail bucket"
+  default     = false
+}
+
+variable "cloudtrail_standard_transition_days" {
+  type        = number
+  description = "Number of days after which to transition cloudtrail objects to standard IA storage"
+  default     = 0
+}
+
+variable "cloudtrail_expiration_days" {
+  type        = number
+  description = "Number of days after which to expire current version cloudtrail objects. Set to 0 to disable expiration"
+  default     = 0
+}
+
+variable "cloudtrail_noncurrent_version_expiration_days" {
+  type        = number
+  description = "Number of days after which to expire noncurrent version cloudtrail objects. Set to 0 to disable expiration"
+  default     = 0
 }
