@@ -173,19 +173,19 @@ module "archive_bucket" {
       enabled = var.lifecycle_rules_enabled
       tags    = {}
 
-      abort_incomplete_multipart_upload_days         = null
-      enable_glacier_transition                      = var.enable_glacier_transition
-      glacier_transition_days                        = var.glacier_transition_days
-      noncurrent_version_glacier_transition_days     = 30
-      enable_deeparchive_transition                  = false
-      deeparchive_transition_days                    = 0
-      noncurrent_version_deeparchive_transition_days = 0
-      enable_standard_ia_transition                  = false
-      standard_transition_days                       = 0
-      enable_current_object_expiration               = false
-      expiration_days                                = 0
-      enable_noncurrent_version_expiration           = false
-      noncurrent_version_expiration_days             = 0
+      abort_incomplete_multipart_upload_days         = var.archive_lifecycle_config.abort_incomplete_multipart_upload_days
+      enable_glacier_transition                      = var.archive_lifecycle_config.enable_glacier_transition
+      glacier_transition_days                        = var.archive_lifecycle_config.glacier_transition_days
+      noncurrent_version_glacier_transition_days     = var.archive_lifecycle_config.noncurrent_version_glacier_transition_days
+      enable_deeparchive_transition                  = var.archive_lifecycle_config.enable_deeparchive_transition
+      deeparchive_transition_days                    = var.archive_lifecycle_config.deeparchive_transition_days
+      noncurrent_version_deeparchive_transition_days = var.archive_lifecycle_config.noncurrent_version_deeparchive_transition_days
+      enable_standard_ia_transition                  = var.archive_lifecycle_config.enable_standard_ia_transition
+      standard_transition_days                       = var.archive_lifecycle_config.standard_transition_days
+      enable_current_object_expiration               = var.archive_lifecycle_config.expiration_days > 0
+      expiration_days                                = var.archive_lifecycle_config.expiration_days
+      enable_noncurrent_version_expiration           = var.archive_lifecycle_config.noncurrent_version_expiration_days > 0
+      noncurrent_version_expiration_days             = var.archive_lifecycle_config.noncurrent_version_expiration_days
     },
   ]
 
@@ -237,19 +237,19 @@ module "cloudtrail_s3_bucket" {
       enabled = var.lifecycle_rules_enabled
       tags    = {}
 
-      abort_incomplete_multipart_upload_days         = null
-      enable_glacier_transition                      = var.enable_glacier_transition
-      glacier_transition_days                        = 365
-      noncurrent_version_glacier_transition_days     = 365
-      enable_deeparchive_transition                  = false
-      deeparchive_transition_days                    = 0
-      noncurrent_version_deeparchive_transition_days = 0
-      enable_standard_ia_transition                  = false
-      standard_transition_days                       = 0
-      enable_current_object_expiration               = false
-      expiration_days                                = 0
-      enable_noncurrent_version_expiration           = false
-      noncurrent_version_expiration_days             = 0
+      abort_incomplete_multipart_upload_days         = var.cloudtrail_lifecycle_config.abort_incomplete_multipart_upload_days
+      enable_glacier_transition                      = var.cloudtrail_lifecycle_config.enable_glacier_transition
+      glacier_transition_days                        = var.cloudtrail_lifecycle_config.glacier_transition_days
+      noncurrent_version_glacier_transition_days     = var.cloudtrail_lifecycle_config.noncurrent_version_glacier_transition_days
+      enable_deeparchive_transition                  = var.cloudtrail_lifecycle_config.enable_deeparchive_transition
+      deeparchive_transition_days                    = var.cloudtrail_lifecycle_config.deeparchive_transition_days
+      noncurrent_version_deeparchive_transition_days = var.cloudtrail_lifecycle_config.noncurrent_version_deeparchive_transition_days
+      enable_standard_ia_transition                  = var.cloudtrail_lifecycle_config.enable_standard_ia_transition
+      standard_transition_days                       = var.cloudtrail_lifecycle_config.standard_transition_days
+      enable_current_object_expiration               = var.cloudtrail_lifecycle_config.expiration_days > 0
+      expiration_days                                = var.cloudtrail_lifecycle_config.expiration_days
+      enable_noncurrent_version_expiration           = var.cloudtrail_lifecycle_config.noncurrent_version_expiration_days > 0
+      noncurrent_version_expiration_days             = var.cloudtrail_lifecycle_config.noncurrent_version_expiration_days
     },
   ]
 
