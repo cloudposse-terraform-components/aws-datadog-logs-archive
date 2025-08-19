@@ -38,7 +38,6 @@ first will avoid terraform timeouts, and then the terraform process can be used 
 
 - first set `s3_force_destroy` var to true and apply
 - next set `enabled` to false and apply or use tf destroy
-
 ## Usage
 
 **Stack Level**: Global
@@ -60,88 +59,8 @@ components:
   #         - "account:123456789012"
 ```
 
-## Requirements
 
-| Name      | Version   |
-| --------- | --------- |
-| terraform | >= 0.13.0 |
-| aws       | >= 2.0    |
-| datadog   | >= 3.3.0  |
-| local     | >= 1.3    |
-
-## Providers
-
-| Name    | Version  |
-| ------- | -------- |
-| aws     | >= 2.0   |
-| datadog | >= 3.7.0 |
-| http    | >= 2.1.0 |
-
-## Modules
-
-| Name                 | Source                              | Version |
-| -------------------- | ----------------------------------- | ------- |
-| cloudtrail           | cloudposse/cloudtrail/aws           | 0.21.0  |
-| cloudtrail_s3_bucket | cloudposse/cloudtrail-s3-bucket/aws | 0.23.1  |
-| iam_roles            | ../account-map/modules/iam-roles    | n/a     |
-| s3_bucket            | cloudposse/s3-bucket/aws            | 0.46.0  |
-| this                 | cloudposse/label/null               | 0.25.0  |
-
-## Resources
-
-| Name                                    | Type        |
-| --------------------------------------- | ----------- |
-| aws_caller_identity.current             | data source |
-| aws_partition.current                   | data source |
-| aws_ssm_parameter.datadog_api_key       | data source |
-| aws_ssm_parameter.datadog_app_key       | data source |
-| aws_ssm_parameter.datadog_aws_role_name | data source |
-| aws_ssm_parameter.datadog_external_id   | data source |
-| datadog_logs_archive.catchall_archive   | resource    |
-| datadog_logs_archive.logs_archive       | resource    |
-| http.current_order                      | data source |
-
-## Inputs
-
-| Name                        | Description                                                                                                             | Type     | Default      | Required         |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------- | -------- | ------------ | ---------------- |
-| additional_query_tags       | Additional tags to include in query for logs for this archive                                                           | `list`   | []           | no               |
-| catchall                    | Set to true to enable a catchall for logs unmatched by any queries. This should only be used in one environment/account | `bool`   | false        | no               |
-| datadog_aws_account_id      | The AWS account ID Datadog's integration servers use for all integrations                                               | `string` | 464622532012 | no               |
-| enable_glacier_transition   | Enable/disable transition to glacier. Has no effect unless `lifecycle_rules_enabled` set to true                        | `bool`   | true         | no               |
-| glacier_transition_days     | Number of days after which to transition objects to glacier storage                                                     | `number` | 365          | no               |
-| lifecycle_rules_enabled     | Enable/disable lifecycle management rules for s3 objects                                                                | `bool`   | true         | no               |
-| object_lock_days_archive    | Set duration of archive bucket object lock                                                                              | `number` | 7            | yes              |
-| object_lock_days_cloudtrail | Set duration of cloudtrail bucket object lock                                                                           | `number` | 7            | yes              |
-| object_lock_mode_archive    | Set mode of archive bucket object lock                                                                                  | `string` | COMPLIANCE   | yes              |
-| object_lock_mode_cloudtrail | Set mode of cloudtrail bucket object lock                                                                               | `string` | COMPLIANCE   | yes              |
-| s3_force_destroy            | Set to true to delete non-empty buckets when `enabled` is set to false                                                  | `bool`   | false        | for destroy only |
-
-## Outputs
-
-| Name                          | Description                                                 |
-| ----------------------------- | ----------------------------------------------------------- |
-| archive_id                    | The ID of the environment-specific log archive              |
-| bucket_arn                    | The ARN of the bucket used for log archive storage          |
-| bucket_domain_name            | The FQDN of the bucket used for log archive storage         |
-| bucket_id                     | The ID (name) of the bucket used for log archive storage    |
-| bucket_region                 | The region of the bucket used for log archive storage       |
-| cloudtrail_bucket_arn         | The ARN of the bucket used for cloudtrail log storage       |
-| cloudtrail_bucket_domain_name | The FQDN of the bucket used for cloudtrail log storage      |
-| cloudtrail_bucket_id          | The ID (name) of the bucket used for cloudtrail log storage |
-| catchall_id                   | The ID of the catchall log archive                          |
-
-## References
-
-- [cloudposse/s3-bucket/aws](https://registry.terraform.io/modules/cloudposse/s3-bucket/aws/latest) - Cloud Posse's S3
-  component
-- [datadog_logs_archive resource]
-  (https://registry.terraform.io/providers/DataDog/datadog/latest/docs/resources/logs_archive) - Datadog's provider
-  documentation for the datadog_logs_archive resource
-
-[<img src="https://cloudposse.com/logo-300x69.svg" height="32" align="right"/>](https://cpco.io/homepage?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=)
-
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- markdownlint-disable -->
 ## Requirements
 
 | Name | Version |
@@ -231,4 +150,19 @@ components:
 | <a name="output_cloudtrail_bucket_arn"></a> [cloudtrail\_bucket\_arn](#output\_cloudtrail\_bucket\_arn) | The ARN of the bucket used for access logging via cloudtrail |
 | <a name="output_cloudtrail_bucket_domain_name"></a> [cloudtrail\_bucket\_domain\_name](#output\_cloudtrail\_bucket\_domain\_name) | The FQDN of the bucket used for access logging via cloudtrail |
 | <a name="output_cloudtrail_bucket_id"></a> [cloudtrail\_bucket\_id](#output\_cloudtrail\_bucket\_id) | The ID (name) of the bucket used for access logging via cloudtrail |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- markdownlint-restore -->
+
+
+
+## References
+
+
+- [cloudposse/s3-bucket/aws](https://registry.terraform.io/modules/cloudposse/s3-bucket/aws/latest) - Cloud Posse's S3 component
+
+- [datadog_logs_archive resource](https://registry.terraform.io/providers/DataDog/datadog/latest/docs/resources/logs_archive) - Datadog's provider documentation for the datadog_logs_archive resource
+
+
+
+
+[<img src="https://cloudposse.com/logo-300x69.svg" height="32" align="right"/>](https://cpco.io/homepage?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=)
+

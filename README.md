@@ -2,8 +2,11 @@
 
 <!-- markdownlint-disable -->
 <a href="https://cpco.io/homepage"><img src="https://github.com/cloudposse-terraform-components/aws-datadog-logs-archive/blob/main/.github/banner.png?raw=true" alt="Project Banner"/></a><br/>
-    <p align="right">
-<a href="https://github.com/cloudposse-terraform-components/aws-datadog-logs-archive/releases/latest"><img src="https://img.shields.io/github/release/cloudposse-terraform-components/aws-datadog-logs-archive.svg?style=for-the-badge" alt="Latest Release"/></a><a href="https://slack.cloudposse.com"><img src="https://slack.cloudposse.com/for-the-badge.svg" alt="Slack Community"/></a></p>
+
+
+<p align="right"><a href="https://github.com/cloudposse-terraform-components/aws-datadog-logs-archive/releases/latest"><img src="https://img.shields.io/github/release/cloudposse-terraform-components/aws-datadog-logs-archive.svg?style=for-the-badge" alt="Latest Release"/></a><a href="https://slack.cloudposse.com"><img src="https://slack.cloudposse.com/for-the-badge.svg" alt="Slack Community"/></a><a href="https://cloudposse.com/support/"><img src="https://img.shields.io/badge/Get_Support-success.svg?style=for-the-badge" alt="Get Support"/></a>
+
+</p>
 <!-- markdownlint-restore -->
 
 <!--
@@ -58,6 +61,22 @@ first will avoid terraform timeouts, and then the terraform process can be used 
 - first set `s3_force_destroy` var to true and apply
 - next set `enabled` to false and apply or use tf destroy
 
+
+> [!TIP]
+> #### 👽 Use Atmos with Terraform
+> Cloud Posse uses [`atmos`](https://atmos.tools) to easily orchestrate multiple environments using Terraform. <br/>
+> Works with [Github Actions](https://atmos.tools/integrations/github-actions/), [Atlantis](https://atmos.tools/integrations/atlantis), or [Spacelift](https://atmos.tools/integrations/spacelift).
+>
+> <details>
+> <summary><strong>Watch demo of using Atmos with Terraform</strong></summary>
+> <img src="https://github.com/cloudposse/atmos/blob/main/docs/demo.gif?raw=true"/><br/>
+> <i>Example of running <a href="https://atmos.tools"><code>atmos</code></a> to manage infrastructure from our <a href="https://atmos.tools/quick-start/">Quick Start</a> tutorial.</i>
+> </details>
+
+
+
+
+
 ## Usage
 
 **Stack Level**: Global
@@ -79,96 +98,11 @@ components:
   #         - "account:123456789012"
 ```
 
-## Requirements
-
-| Name      | Version   |
-| --------- | --------- |
-| terraform | >= 0.13.0 |
-| aws       | >= 2.0    |
-| datadog   | >= 3.3.0  |
-| local     | >= 1.3    |
-
-## Providers
-
-| Name    | Version  |
-| ------- | -------- |
-| aws     | >= 2.0   |
-| datadog | >= 3.7.0 |
-| http    | >= 2.1.0 |
-
-## Modules
-
-| Name                 | Source                              | Version |
-| -------------------- | ----------------------------------- | ------- |
-| cloudtrail           | cloudposse/cloudtrail/aws           | 0.21.0  |
-| cloudtrail_s3_bucket | cloudposse/cloudtrail-s3-bucket/aws | 0.23.1  |
-| iam_roles            | ../account-map/modules/iam-roles    | n/a     |
-| s3_bucket            | cloudposse/s3-bucket/aws            | 0.46.0  |
-| this                 | cloudposse/label/null               | 0.25.0  |
-
-## Resources
-
-| Name                                    | Type        |
-| --------------------------------------- | ----------- |
-| aws_caller_identity.current             | data source |
-| aws_partition.current                   | data source |
-| aws_ssm_parameter.datadog_api_key       | data source |
-| aws_ssm_parameter.datadog_app_key       | data source |
-| aws_ssm_parameter.datadog_aws_role_name | data source |
-| aws_ssm_parameter.datadog_external_id   | data source |
-| datadog_logs_archive.catchall_archive   | resource    |
-| datadog_logs_archive.logs_archive       | resource    |
-| http.current_order                      | data source |
-
-## Inputs
-
-| Name                        | Description                                                                                                             | Type     | Default      | Required         |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------- | -------- | ------------ | ---------------- |
-| additional_query_tags       | Additional tags to include in query for logs for this archive                                                           | `list`   | []           | no               |
-| catchall                    | Set to true to enable a catchall for logs unmatched by any queries. This should only be used in one environment/account | `bool`   | false        | no               |
-| datadog_aws_account_id      | The AWS account ID Datadog's integration servers use for all integrations                                               | `string` | 464622532012 | no               |
-| enable_glacier_transition   | Enable/disable transition to glacier. Has no effect unless `lifecycle_rules_enabled` set to true                        | `bool`   | true         | no               |
-| glacier_transition_days     | Number of days after which to transition objects to glacier storage                                                     | `number` | 365          | no               |
-| lifecycle_rules_enabled     | Enable/disable lifecycle management rules for s3 objects                                                                | `bool`   | true         | no               |
-| object_lock_days_archive    | Set duration of archive bucket object lock                                                                              | `number` | 7            | yes              |
-| object_lock_days_cloudtrail | Set duration of cloudtrail bucket object lock                                                                           | `number` | 7            | yes              |
-| object_lock_mode_archive    | Set mode of archive bucket object lock                                                                                  | `string` | COMPLIANCE   | yes              |
-| object_lock_mode_cloudtrail | Set mode of cloudtrail bucket object lock                                                                               | `string` | COMPLIANCE   | yes              |
-| s3_force_destroy            | Set to true to delete non-empty buckets when `enabled` is set to false                                                  | `bool`   | false        | for destroy only |
-
-## Outputs
-
-| Name                          | Description                                                 |
-| ----------------------------- | ----------------------------------------------------------- |
-| archive_id                    | The ID of the environment-specific log archive              |
-| bucket_arn                    | The ARN of the bucket used for log archive storage          |
-| bucket_domain_name            | The FQDN of the bucket used for log archive storage         |
-| bucket_id                     | The ID (name) of the bucket used for log archive storage    |
-| bucket_region                 | The region of the bucket used for log archive storage       |
-| cloudtrail_bucket_arn         | The ARN of the bucket used for cloudtrail log storage       |
-| cloudtrail_bucket_domain_name | The FQDN of the bucket used for cloudtrail log storage      |
-| cloudtrail_bucket_id          | The ID (name) of the bucket used for cloudtrail log storage |
-| catchall_id                   | The ID of the catchall log archive                          |
-
-## References
-
-- [cloudposse/s3-bucket/aws](https://registry.terraform.io/modules/cloudposse/s3-bucket/aws/latest) - Cloud Posse's S3
-  component
-- [datadog_logs_archive resource]
-  (https://registry.terraform.io/providers/DataDog/datadog/latest/docs/resources/logs_archive) - Datadog's provider
-  documentation for the datadog_logs_archive resource
-
-
-> [!TIP]
-> #### 👽 Use Atmos with Terraform
-> Cloud Posse uses [`atmos`](https://atmos.tools) to easily orchestrate multiple environments using Terraform. <br/>
-> Works with [Github Actions](https://atmos.tools/integrations/github-actions/), [Atlantis](https://atmos.tools/integrations/atlantis), or [Spacelift](https://atmos.tools/integrations/spacelift).
->
-> <details>
-> <summary><strong>Watch demo of using Atmos with Terraform</strong></summary>
-> <img src="https://github.com/cloudposse/atmos/blob/main/docs/demo.gif?raw=true"/><br/>
-> <i>Example of running <a href="https://atmos.tools"><code>atmos</code></a> to manage infrastructure from our <a href="https://atmos.tools/quick-start/">Quick Start</a> tutorial.</i>
-> </details>
+> [!IMPORTANT]
+> In Cloud Posse's examples, we avoid pinning modules to specific versions to prevent discrepancies between the documentation
+> and the latest released versions. However, for your own projects, we strongly advise pinning each module to the exact version
+> you're using. This practice ensures the stability of your infrastructure. Additionally, we recommend implementing a systematic
+> approach for updating versions to avoid unexpected changes.
 
 
 
@@ -177,139 +111,7 @@ components:
 
 
 
-
-
-
-## Related Projects
-
-Check out these related projects.
-
-- [Cloud Posse Terraform Modules](https://docs.cloudposse.com/modules/) - Our collection of reusable Terraform modules used by our reference architectures.
-- [Atmos](https://atmos.tools) - Atmos is like docker-compose but for your infrastructure
-
-
-> [!TIP]
-> #### Use Terraform Reference Architectures for AWS
->
-> Use Cloud Posse's ready-to-go [terraform architecture blueprints](https://cloudposse.com/reference-architecture/) for AWS to get up and running quickly.
->
-> ✅ We build it together with your team.<br/>
-> ✅ Your team owns everything.<br/>
-> ✅ 100% Open Source and backed by fanatical support.<br/>
->
-> <a href="https://cpco.io/commercial-support?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=commercial_support"><img alt="Request Quote" src="https://img.shields.io/badge/request%20quote-success.svg?style=for-the-badge"/></a>
-> <details><summary>📚 <strong>Learn More</strong></summary>
->
-> <br/>
->
-> Cloud Posse is the leading [**DevOps Accelerator**](https://cpco.io/commercial-support?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=commercial_support) for funded startups and enterprises.
->
-> *Your team can operate like a pro today.*
->
-> Ensure that your team succeeds by using Cloud Posse's proven process and turnkey blueprints. Plus, we stick around until you succeed.
-> #### Day-0:  Your Foundation for Success
-> - **Reference Architecture.** You'll get everything you need from the ground up built using 100% infrastructure as code.
-> - **Deployment Strategy.** Adopt a proven deployment strategy with GitHub Actions, enabling automated, repeatable, and reliable software releases.
-> - **Site Reliability Engineering.** Gain total visibility into your applications and services with Datadog, ensuring high availability and performance.
-> - **Security Baseline.** Establish a secure environment from the start, with built-in governance, accountability, and comprehensive audit logs, safeguarding your operations.
-> - **GitOps.** Empower your team to manage infrastructure changes confidently and efficiently through Pull Requests, leveraging the full power of GitHub Actions.
->
-> <a href="https://cpco.io/commercial-support?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=commercial_support"><img alt="Request Quote" src="https://img.shields.io/badge/request%20quote-success.svg?style=for-the-badge"/></a>
->
-> #### Day-2: Your Operational Mastery
-> - **Training.** Equip your team with the knowledge and skills to confidently manage the infrastructure, ensuring long-term success and self-sufficiency.
-> - **Support.** Benefit from a seamless communication over Slack with our experts, ensuring you have the support you need, whenever you need it.
-> - **Troubleshooting.** Access expert assistance to quickly resolve any operational challenges, minimizing downtime and maintaining business continuity.
-> - **Code Reviews.** Enhance your team’s code quality with our expert feedback, fostering continuous improvement and collaboration.
-> - **Bug Fixes.** Rely on our team to troubleshoot and resolve any issues, ensuring your systems run smoothly.
-> - **Migration Assistance.** Accelerate your migration process with our dedicated support, minimizing disruption and speeding up time-to-value.
-> - **Customer Workshops.** Engage with our team in weekly workshops, gaining insights and strategies to continuously improve and innovate.
->
-> <a href="https://cpco.io/commercial-support?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=commercial_support"><img alt="Request Quote" src="https://img.shields.io/badge/request%20quote-success.svg?style=for-the-badge"/></a>
-> </details>
-
-## ✨ Contributing
-
-This project is under active development, and we encourage contributions from our community.
-
-
-
-Many thanks to our outstanding contributors:
-
-<a href="https://github.com/cloudposse-terraform-components/aws-datadog-logs-archive/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=cloudposse-terraform-components/aws-datadog-logs-archive&max=24" />
-</a>
-
-For 🐛 bug reports & feature requests, please use the [issue tracker](https://github.com/cloudposse-terraform-components/aws-datadog-logs-archive/issues).
-
-In general, PRs are welcome. We follow the typical "fork-and-pull" Git workflow.
- 1. Review our [Code of Conduct](https://github.com/cloudposse-terraform-components/aws-datadog-logs-archive/?tab=coc-ov-file#code-of-conduct) and [Contributor Guidelines](https://github.com/cloudposse/.github/blob/main/CONTRIBUTING.md).
- 2. **Fork** the repo on GitHub
- 3. **Clone** the project to your own machine
- 4. **Commit** changes to your own branch
- 5. **Push** your work back up to your fork
- 6. Submit a **Pull Request** so that we can review your changes
-
-**NOTE:** Be sure to merge the latest changes from "upstream" before making a pull request!
-
-### 🌎 Slack Community
-
-Join our [Open Source Community](https://cpco.io/slack?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=slack) on Slack. It's **FREE** for everyone! Our "SweetOps" community is where you get to talk with others who share a similar vision for how to rollout and manage infrastructure. This is the best place to talk shop, ask questions, solicit feedback, and work together as a community to build totally *sweet* infrastructure.
-
-### 📰 Newsletter
-
-Sign up for [our newsletter](https://cpco.io/newsletter?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=newsletter) and join 3,000+ DevOps engineers, CTOs, and founders who get insider access to the latest DevOps trends, so you can always stay in the know.
-Dropped straight into your Inbox every week — and usually a 5-minute read.
-
-### 📆 Office Hours <a href="https://cloudposse.com/office-hours?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=office_hours"><img src="https://img.cloudposse.com/fit-in/200x200/https://cloudposse.com/wp-content/uploads/2019/08/Powered-by-Zoom.png" align="right" /></a>
-
-[Join us every Wednesday via Zoom](https://cloudposse.com/office-hours?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=office_hours) for your weekly dose of insider DevOps trends, AWS news and Terraform insights, all sourced from our SweetOps community, plus a _live Q&A_ that you can’t find anywhere else.
-It's **FREE** for everyone!
-## License
-
-<a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge" alt="License"></a>
-
-<details>
-<summary>Preamble to the Apache License, Version 2.0</summary>
-<br/>
-<br/>
-
-
-
-```text
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements.  See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership.  The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License.  You may obtain a copy of the License at
-
-  https://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied.  See the License for the
-specific language governing permissions and limitations
-under the License.
-```
-</details>
-
-## Trademarks
-
-All other trademarks referenced herein are the property of their respective owners.
-
-
----
-Copyright © 2017-2025 [Cloud Posse, LLC](https://cpco.io/copyright)
-
-
-<a href="https://cloudposse.com/readme/footer/link?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=readme_footer_link"><img alt="README footer" src="https://cloudposse.com/readme/footer/img"/></a>
-
-<img alt="Beacon" width="0" src="https://ga-beacon.cloudposse.com/UA-76589703-4/cloudposse-terraform-components/aws-datadog-logs-archive?pixel&cs=github&cm=readme&an=aws-datadog-logs-archive"/>
-
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- markdownlint-disable -->
 ## Requirements
 
 | Name | Version |
@@ -399,4 +201,179 @@ Copyright © 2017-2025 [Cloud Posse, LLC](https://cpco.io/copyright)
 | <a name="output_cloudtrail_bucket_arn"></a> [cloudtrail\_bucket\_arn](#output\_cloudtrail\_bucket\_arn) | The ARN of the bucket used for access logging via cloudtrail |
 | <a name="output_cloudtrail_bucket_domain_name"></a> [cloudtrail\_bucket\_domain\_name](#output\_cloudtrail\_bucket\_domain\_name) | The FQDN of the bucket used for access logging via cloudtrail |
 | <a name="output_cloudtrail_bucket_id"></a> [cloudtrail\_bucket\_id](#output\_cloudtrail\_bucket\_id) | The ID (name) of the bucket used for access logging via cloudtrail |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- markdownlint-restore -->
+
+
+
+
+
+
+## Related Projects
+
+Check out these related projects.
+
+- [Cloud Posse Terraform Modules](https://docs.cloudposse.com/modules/) - Our collection of reusable Terraform modules used by our reference architectures.
+- [Atmos](https://atmos.tools) - Atmos is like docker-compose but for your infrastructure
+
+
+## References
+
+For additional context, refer to some of these links.
+
+- [cloudposse/s3-bucket/aws](https://registry.terraform.io/modules/cloudposse/s3-bucket/aws/latest) - Cloud Posse's S3 component
+- [datadog_logs_archive resource](https://registry.terraform.io/providers/DataDog/datadog/latest/docs/resources/logs_archive) - Datadog's provider documentation for the datadog_logs_archive resource
+
+
+
+> [!TIP]
+> #### Use Terraform Reference Architectures for AWS
+>
+> Use Cloud Posse's ready-to-go [terraform architecture blueprints](https://cloudposse.com/reference-architecture/) for AWS to get up and running quickly.
+>
+> ✅ We build it together with your team.<br/>
+> ✅ Your team owns everything.<br/>
+> ✅ 100% Open Source and backed by fanatical support.<br/>
+>
+> <a href="https://cpco.io/commercial-support?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=commercial_support"><img alt="Request Quote" src="https://img.shields.io/badge/request%20quote-success.svg?style=for-the-badge"/></a>
+> <details><summary>📚 <strong>Learn More</strong></summary>
+>
+> <br/>
+>
+> Cloud Posse is the leading [**DevOps Accelerator**](https://cpco.io/commercial-support?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=commercial_support) for funded startups and enterprises.
+>
+> *Your team can operate like a pro today.*
+>
+> Ensure that your team succeeds by using Cloud Posse's proven process and turnkey blueprints. Plus, we stick around until you succeed.
+> #### Day-0:  Your Foundation for Success
+> - **Reference Architecture.** You'll get everything you need from the ground up built using 100% infrastructure as code.
+> - **Deployment Strategy.** Adopt a proven deployment strategy with GitHub Actions, enabling automated, repeatable, and reliable software releases.
+> - **Site Reliability Engineering.** Gain total visibility into your applications and services with Datadog, ensuring high availability and performance.
+> - **Security Baseline.** Establish a secure environment from the start, with built-in governance, accountability, and comprehensive audit logs, safeguarding your operations.
+> - **GitOps.** Empower your team to manage infrastructure changes confidently and efficiently through Pull Requests, leveraging the full power of GitHub Actions.
+>
+> <a href="https://cpco.io/commercial-support?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=commercial_support"><img alt="Request Quote" src="https://img.shields.io/badge/request%20quote-success.svg?style=for-the-badge"/></a>
+>
+> #### Day-2: Your Operational Mastery
+> - **Training.** Equip your team with the knowledge and skills to confidently manage the infrastructure, ensuring long-term success and self-sufficiency.
+> - **Support.** Benefit from a seamless communication over Slack with our experts, ensuring you have the support you need, whenever you need it.
+> - **Troubleshooting.** Access expert assistance to quickly resolve any operational challenges, minimizing downtime and maintaining business continuity.
+> - **Code Reviews.** Enhance your team’s code quality with our expert feedback, fostering continuous improvement and collaboration.
+> - **Bug Fixes.** Rely on our team to troubleshoot and resolve any issues, ensuring your systems run smoothly.
+> - **Migration Assistance.** Accelerate your migration process with our dedicated support, minimizing disruption and speeding up time-to-value.
+> - **Customer Workshops.** Engage with our team in weekly workshops, gaining insights and strategies to continuously improve and innovate.
+>
+> <a href="https://cpco.io/commercial-support?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=commercial_support"><img alt="Request Quote" src="https://img.shields.io/badge/request%20quote-success.svg?style=for-the-badge"/></a>
+> </details>
+
+## ✨ Contributing
+
+This project is under active development, and we encourage contributions from our community.
+
+
+
+Many thanks to our outstanding contributors:
+
+<a href="https://github.com/cloudposse-terraform-components/aws-datadog-logs-archive/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=cloudposse-terraform-components/aws-datadog-logs-archive&max=24" />
+</a>
+
+For 🐛 bug reports & feature requests, please use the [issue tracker](https://github.com/cloudposse-terraform-components/aws-datadog-logs-archive/issues).
+
+In general, PRs are welcome. We follow the typical "fork-and-pull" Git workflow.
+ 1. Review our [Code of Conduct](https://github.com/cloudposse-terraform-components/aws-datadog-logs-archive/?tab=coc-ov-file#code-of-conduct) and [Contributor Guidelines](https://github.com/cloudposse/.github/blob/main/CONTRIBUTING.md).
+ 2. **Fork** the repo on GitHub
+ 3. **Clone** the project to your own machine
+ 4. **Commit** changes to your own branch
+ 5. **Push** your work back up to your fork
+ 6. Submit a **Pull Request** so that we can review your changes
+
+**NOTE:** Be sure to merge the latest changes from "upstream" before making a pull request!
+
+
+## Running Terraform Tests
+
+We use [Atmos](https://atmos.tools) to streamline how Terraform tests are run. It centralizes configuration and wraps common test workflows with easy-to-use commands.
+
+All tests are located in the [`test/`](test) folder.
+
+Under the hood, tests are powered by Terratest together with our internal [Test Helpers](https://github.com/cloudposse/test-helpers) library, providing robust infrastructure validation.
+
+Setup dependencies:
+- Install Atmos ([installation guide](https://atmos.tools/install/))
+- Install Go [1.24+ or newer](https://go.dev/doc/install)
+- Install Terraform or OpenTofu
+
+To run tests:
+
+- Run all tests:  
+  ```sh
+  atmos test run
+  ```
+- Clean up test artifacts:  
+  ```sh
+  atmos test clean
+  ```
+- Explore additional test options:  
+  ```sh
+  atmos test --help
+  ```
+The configuration for test commands is centrally managed. To review what's being imported, see the [`atmos.yaml`](https://raw.githubusercontent.com/cloudposse/.github/refs/heads/main/.github/atmos/terraform-module.yaml) file.
+
+Learn more about our [automated testing in our documentation](https://docs.cloudposse.com/community/contribute/automated-testing/) or implementing [custom commands](https://atmos.tools/core-concepts/custom-commands/) with atmos.
+
+### 🌎 Slack Community
+
+Join our [Open Source Community](https://cpco.io/slack?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=slack) on Slack. It's **FREE** for everyone! Our "SweetOps" community is where you get to talk with others who share a similar vision for how to rollout and manage infrastructure. This is the best place to talk shop, ask questions, solicit feedback, and work together as a community to build totally *sweet* infrastructure.
+
+### 📰 Newsletter
+
+Sign up for [our newsletter](https://cpco.io/newsletter?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=newsletter) and join 3,000+ DevOps engineers, CTOs, and founders who get insider access to the latest DevOps trends, so you can always stay in the know.
+Dropped straight into your Inbox every week — and usually a 5-minute read.
+
+### 📆 Office Hours <a href="https://cloudposse.com/office-hours?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=office_hours"><img src="https://img.cloudposse.com/fit-in/200x200/https://cloudposse.com/wp-content/uploads/2019/08/Powered-by-Zoom.png" align="right" /></a>
+
+[Join us every Wednesday via Zoom](https://cloudposse.com/office-hours?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=office_hours) for your weekly dose of insider DevOps trends, AWS news and Terraform insights, all sourced from our SweetOps community, plus a _live Q&A_ that you can’t find anywhere else.
+It's **FREE** for everyone!
+## License
+
+<a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=for-the-badge" alt="License"></a>
+
+<details>
+<summary>Preamble to the Apache License, Version 2.0</summary>
+<br/>
+<br/>
+
+
+
+```text
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+```
+</details>
+
+## Trademarks
+
+All other trademarks referenced herein are the property of their respective owners.
+
+
+---
+Copyright © 2017-2025 [Cloud Posse, LLC](https://cpco.io/copyright)
+
+
+<a href="https://cloudposse.com/readme/footer/link?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-datadog-logs-archive&utm_content=readme_footer_link"><img alt="README footer" src="https://cloudposse.com/readme/footer/img"/></a>
+
+<img alt="Beacon" width="0" src="https://ga-beacon.cloudposse.com/UA-76589703-4/cloudposse-terraform-components/aws-datadog-logs-archive?pixel&cs=github&cm=readme&an=aws-datadog-logs-archive"/>
