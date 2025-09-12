@@ -37,9 +37,9 @@ usage: |-
             workspace_enabled: true
         vars:
           enabled: true
-    #   additional_query_tags:
-    #     - "forwardername:*-dev-datadog-lambda-forwarder-logs"
-    #     - "account:123456789012"
+      #   additional_query_tags: 
+      #     - "forwardername:*-dev-datadog-lambda-forwarder-logs"
+      #     - "account:123456789012"
   ```
 references:
   - name: cloudposse/s3-bucket/aws
