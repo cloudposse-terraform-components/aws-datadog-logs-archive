@@ -21,6 +21,23 @@ description: |-
     - Two-step process to destroy via Terraform:
       1) Set `s3_force_destroy` to `true` and apply
       2) Set `enabled` to `false` and apply, or run `terraform destroy`
+
+  ## Sponsorship
+
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://cloudposse.com/images/partners/datadog-white.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://cloudposse.com/images/partners/datadog-purple.svg">
+    <img alt="Datadog" src="https://cloudposse.com/images/partners/datadog-purple.svg" align="right" width="40%">
+  </picture>
+
+
+  This project is supported by the [Datadog Open Source Program](https://www.datadoghq.com/partner/open-source/).
+
+  As part of this collaboration, Datadog provides a dedicated sandbox account that we use for automated integration and acceptance testing. This contribution allows us to continuously validate changes against a real Datadog environment, improving reliability and reducing the risk of regressions.
+
+  We are grateful to Datadog for supporting our open source ecosystem and helping ensure that infrastructure code for Terraform remains stable and well-tested
+  ___
+
 usage: |-
   Stack Level: Global
 
@@ -37,7 +54,7 @@ usage: |-
             workspace_enabled: true
         vars:
           enabled: true
-      #   additional_query_tags: 
+      #   additional_query_tags:
       #     - "forwardername:*-dev-datadog-lambda-forwarder-logs"
       #     - "account:123456789012"
   ```
