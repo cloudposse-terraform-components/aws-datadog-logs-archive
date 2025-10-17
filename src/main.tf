@@ -26,6 +26,10 @@ locals {
   ordered_ids      = concat(local.non_catchall_ids, local.catchall_id)
 
   policy = local.enabled ? jsondecode(data.aws_iam_policy_document.default[0].json) : null
+
+  # default datadog_logs_archive query. 
+  default_query = join(" OR ", concat([join(":", ["env", var.stage]), join(":", ["account", local.aws_account_id])], var.additional_query_tags))
+  query         = var.query_override == null ? local.default_query : var.query_override
 }
 
 # We use the http data source due to lack of a data source for datadog_logs_archive_order
@@ -61,7 +65,7 @@ data "aws_iam_policy_document" "default" {
     ]
 
     resources = [
-      "arn:${local.aws_partition}:s3:::${module.this.id}-cloudtrail",
+      "arn:${local.aws_partition}:s3:::${module.cloudtrail_label.id}",
     ]
   }
 
@@ -80,7 +84,7 @@ data "aws_iam_policy_document" "default" {
     ]
 
     resources = [
-      "arn:${local.aws_partition}:s3:::${module.this.id}-cloudtrail/*",
+      "arn:${local.aws_partition}:s3:::${module.cloudtrail_label.id}/*",
     ]
 
     condition {
@@ -115,7 +119,7 @@ data "aws_iam_policy_document" "default" {
     ]
 
     resources = [
-      "arn:${local.aws_partition}:s3:::${module.this.id}-cloudtrail/*",
+      "arn:${local.aws_partition}:s3:::${module.cloudtrail_label.id}/*",
     ]
 
     condition {
@@ -216,6 +220,15 @@ module "archive_bucket" {
   context = module.this.context
 }
 
+module "cloudtrail_label" {
+  source  = "cloudposse/label/null"
+  version = "0.25.0" # requires Terraform >= 0.13.0
+
+  name    = "datadog-logs-archive-cloudtrail"
+  context = module.this.context
+}
+
+
 module "cloudtrail_s3_bucket" {
   source  = "cloudposse/s3-bucket/aws"
   version = "4.10.0"
@@ -224,7 +237,6 @@ module "cloudtrail_s3_bucket" {
 
   count = local.enabled ? 1 : 0
 
-  name          = "datadog-logs-archive-cloudtrail"
   acl           = "private"
   enabled       = local.enabled
   force_destroy = var.s3_force_destroy
@@ -282,7 +294,7 @@ module "cloudtrail_s3_bucket" {
   # https://github.com/hashicorp/terraform/issues/5613
   allow_ssl_requests_only = false
 
-  context = module.this.context
+  context = module.cloudtrail_label.context
 }
 
 module "cloudtrail" {
@@ -330,7 +342,7 @@ resource "datadog_logs_archive" "logs_archive" {
   name             = var.stage
   include_tags     = true
   rehydration_tags = ["rehydrated:true"]
-  query            = join(" OR ", concat([join(":", ["env", var.stage]), join(":", ["account", local.aws_account_id])], var.additional_query_tags))
+  query            = local.query
 
   s3_archive {
     bucket     = module.archive_bucket[0].bucket_id

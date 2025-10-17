@@ -3,6 +3,12 @@ variable "region" {
   description = "AWS Region"
 }
 
+variable "query_override" {
+  type        = string
+  nullable    = true
+  description = "Override query for datadog archive. If null would be used query 'env:{stage} OR account:{aws account id} OR {additional_query_tags}'"
+}
+
 variable "additional_query_tags" {
   type        = list(any)
   description = "Additional tags to be used in the query for this archive"
