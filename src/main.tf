@@ -26,6 +26,11 @@ locals {
   ordered_ids      = concat(local.non_catchall_ids, local.catchall_id)
 
   policy = local.enabled ? jsondecode(data.aws_iam_policy_document.default[0].json) : null
+
+  # default datadog_logs_archive query. 
+  default_query = join(" OR ", concat([join(":", ["env", var.stage]), join(":", ["account", local.aws_account_id])], var.additional_query_tags))
+  
+  query = var.query_override == null ? local.default_query : var.query_override
 }
 
 # We use the http data source due to lack of a data source for datadog_logs_archive_order
@@ -338,7 +343,7 @@ resource "datadog_logs_archive" "logs_archive" {
   name             = var.stage
   include_tags     = true
   rehydration_tags = ["rehydrated:true"]
-  query            = join(" OR ", concat([join(":", ["env", var.stage]), join(":", ["account", local.aws_account_id])], var.additional_query_tags))
+  query            = local.query
 
   s3_archive {
     bucket     = module.archive_bucket[0].bucket_id
