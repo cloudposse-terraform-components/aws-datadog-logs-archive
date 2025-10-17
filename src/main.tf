@@ -29,7 +29,6 @@ locals {
 
   # default datadog_logs_archive query. 
   default_query = join(" OR ", concat([join(":", ["env", var.stage]), join(":", ["account", local.aws_account_id])], var.additional_query_tags))
-  
   query = var.query_override == null ? local.default_query : var.query_override
 }
 
