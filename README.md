@@ -141,6 +141,7 @@ components:
 | <a name="module_archive_bucket"></a> [archive\_bucket](#module\_archive\_bucket) | cloudposse/s3-bucket/aws | 4.10.0 |
 | <a name="module_bucket_policy"></a> [bucket\_policy](#module\_bucket\_policy) | cloudposse/iam-policy/aws | 2.0.2 |
 | <a name="module_cloudtrail"></a> [cloudtrail](#module\_cloudtrail) | cloudposse/cloudtrail/aws | 0.24.0 |
+| <a name="module_cloudtrail_label"></a> [cloudtrail\_label](#module\_cloudtrail\_label) | cloudposse/label/null | 0.25.0 |
 | <a name="module_cloudtrail_s3_bucket"></a> [cloudtrail\_s3\_bucket](#module\_cloudtrail\_s3\_bucket) | cloudposse/s3-bucket/aws | 4.10.0 |
 | <a name="module_datadog_configuration"></a> [datadog\_configuration](#module\_datadog\_configuration) | github.com/cloudposse-terraform-components/aws-datadog-credentials//src/modules/datadog_keys | v1.535.11 |
 | <a name="module_iam_roles"></a> [iam\_roles](#module\_iam\_roles) | github.com/cloudposse-terraform-components/aws-account-map//src/modules/iam-roles | v1.536.0 |
@@ -186,6 +187,7 @@ components:
 | <a name="input_object_lock_days_cloudtrail"></a> [object\_lock\_days\_cloudtrail](#input\_object\_lock\_days\_cloudtrail) | Object lock duration for cloudtrail buckets in days | `number` | `7` | no |
 | <a name="input_object_lock_mode_archive"></a> [object\_lock\_mode\_archive](#input\_object\_lock\_mode\_archive) | Object lock mode for archive bucket. Possible values are COMPLIANCE or GOVERNANCE | `string` | `"COMPLIANCE"` | no |
 | <a name="input_object_lock_mode_cloudtrail"></a> [object\_lock\_mode\_cloudtrail](#input\_object\_lock\_mode\_cloudtrail) | Object lock mode for cloudtrail bucket. Possible values are COMPLIANCE or GOVERNANCE | `string` | `"COMPLIANCE"` | no |
+| <a name="input_query_override"></a> [query\_override](#input\_query\_override) | Override query for datadog archive. If null would be used query 'env:{stage} OR account:{aws account id} OR {additional\_query\_tags}' | `string` | n/a | yes |
 | <a name="input_regex_replace_chars"></a> [regex\_replace\_chars](#input\_regex\_replace\_chars) | Terraform regular expression (regex) string.<br/>Characters matching the regex will be removed from the ID elements.<br/>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
 | <a name="input_region"></a> [region](#input\_region) | AWS Region | `string` | n/a | yes |
 | <a name="input_s3_force_destroy"></a> [s3\_force\_destroy](#input\_s3\_force\_destroy) | Set to true to delete non-empty buckets when enabled is set to false | `bool` | `false` | no |
