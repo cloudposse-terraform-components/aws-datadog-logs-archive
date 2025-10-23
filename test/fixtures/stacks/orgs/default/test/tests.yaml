@@ -1,0 +1,6 @@
+import:
+  - orgs/default/test/_defaults
+  - catalog/datadog-configuration
+  - catalog/datadog-integration
+  - catalog/usecase/basic
+  - catalog/usecase/disabled

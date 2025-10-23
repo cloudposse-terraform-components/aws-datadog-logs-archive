@@ -7,6 +7,7 @@ variable "query_override" {
   type        = string
   nullable    = true
   description = "Override query for datadog archive. If null would be used query 'env:{stage} OR account:{aws account id} OR {additional_query_tags}'"
+  default     = null
 }
 
 variable "additional_query_tags" {
