@@ -27,7 +27,7 @@ locals {
 
   policy = local.enabled ? jsondecode(data.aws_iam_policy_document.default[0].json) : null
 
-  # default datadog_logs_archive query. 
+  # default datadog_logs_archive query.
   default_query = join(" OR ", concat([join(":", ["env", var.stage]), join(":", ["account", local.aws_account_id])], var.additional_query_tags))
   query         = var.query_override == null ? local.default_query : var.query_override
 }
@@ -65,7 +65,7 @@ data "aws_iam_policy_document" "default" {
     ]
 
     resources = [
-      "arn:${local.aws_partition}:s3:::${module.cloudtrail_label.id}",
+      "arn:${local.aws_partition}:s3:::${module.cloudtrail_bucket_label.id}",
     ]
   }
 
@@ -84,7 +84,7 @@ data "aws_iam_policy_document" "default" {
     ]
 
     resources = [
-      "arn:${local.aws_partition}:s3:::${module.cloudtrail_label.id}/*",
+      "arn:${local.aws_partition}:s3:::${module.cloudtrail_bucket_label.id}/*",
     ]
 
     condition {
@@ -98,7 +98,7 @@ data "aws_iam_policy_document" "default" {
       test     = "StringLike"
       variable = "aws:SourceArn"
       values = [
-        "arn:${local.aws_partition}:cloudtrail:*:${local.aws_account_id}:trail/*datadog-logs-archive",
+        "arn:${local.aws_partition}:cloudtrail:*:${local.aws_account_id}:trail/${module.this.id}",
       ]
     }
 
@@ -119,7 +119,7 @@ data "aws_iam_policy_document" "default" {
     ]
 
     resources = [
-      "arn:${local.aws_partition}:s3:::${module.cloudtrail_label.id}/*",
+      "arn:${local.aws_partition}:s3:::${module.cloudtrail_bucket_label.id}/*",
     ]
 
     condition {
@@ -133,7 +133,7 @@ data "aws_iam_policy_document" "default" {
       test     = "StringLike"
       variable = "aws:SourceArn"
       values = [
-        "arn:${local.aws_partition}:cloudtrail:*:${local.aws_account_id}:trail/*datadog-logs-archive",
+        "arn:${local.aws_partition}:cloudtrail:*:${local.aws_account_id}:trail/${module.this.id}",
       ]
     }
 
@@ -211,7 +211,7 @@ module "archive_bucket" {
   user_enabled       = false
   versioning_enabled = true
 
-  object_lock_configuration = {
+  object_lock_configuration = var.object_lock_days_archive == 0 ? null : {
     mode  = var.object_lock_mode_archive
     days  = var.object_lock_days_archive
     years = null
@@ -220,7 +220,7 @@ module "archive_bucket" {
   context = module.this.context
 }
 
-module "cloudtrail_label" {
+module "cloudtrail_bucket_label" {
   source  = "cloudposse/label/null"
   version = "0.25.0" # requires Terraform >= 0.13.0
 
@@ -278,7 +278,7 @@ module "cloudtrail_s3_bucket" {
   label_key_case   = "lower"
   label_value_case = "lower"
 
-  object_lock_configuration = {
+  object_lock_configuration = var.object_lock_days_cloudtrail == 0 ? null : {
     mode  = var.object_lock_mode_cloudtrail
     days  = var.object_lock_days_cloudtrail
     years = null
@@ -294,7 +294,7 @@ module "cloudtrail_s3_bucket" {
   # https://github.com/hashicorp/terraform/issues/5613
   allow_ssl_requests_only = false
 
-  context = module.cloudtrail_label.context
+  context = module.cloudtrail_bucket_label.context
 }
 
 module "cloudtrail" {

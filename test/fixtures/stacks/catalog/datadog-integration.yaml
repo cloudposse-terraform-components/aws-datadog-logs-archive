@@ -1,0 +1,8 @@
+components:
+  terraform:
+    datadog-integration:
+      vars:
+        enabled: true
+        name: datadog-integration
+
+

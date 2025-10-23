@@ -1,0 +1,8 @@
+components:
+  terraform:
+    datadog-logs-archive/disabled:
+      metadata:
+        component: datadog-logs-archive
+      vars:
+        enabled: false
+        name: datadog-logs-archive

@@ -1,0 +1,10 @@
+components:
+  terraform:
+    datadog-logs-archive/basic:
+      metadata:
+        component: datadog-logs-archive
+      vars:
+        enabled: true
+        name: datadog-logs-archive
+        object_lock_days_archive: 0
+        object_lock_days_cloudtrail: 0
