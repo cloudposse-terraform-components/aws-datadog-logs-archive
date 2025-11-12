@@ -30,6 +30,14 @@ locals {
   # default datadog_logs_archive query.
   default_query = join(" OR ", concat([join(":", ["env", var.stage]), join(":", ["account", local.aws_account_id])], var.additional_query_tags))
   query         = var.query_override == null ? local.default_query : var.query_override
+
+  # CloudTrail KMS key ARN selection
+  cloudtrail_kms_key_arn = (
+    var.cloudtrail_enable_kms_encryption == false ? null :
+    var.cloudtrail_kms_key_arn != null ? var.cloudtrail_kms_key_arn :
+    var.cloudtrail_create_kms_key && local.enabled ? try(aws_kms_key.cloudtrail[0].arn, null) :
+    null
+  )
 }
 
 # We use the http data source due to lack of a data source for datadog_logs_archive_order
@@ -304,7 +312,7 @@ module "cloudtrail" {
   # dependency on the attachment of the bucket policy, leading to
   # insufficient permissions issues on cloudtrail creation if it
   # happens to be attempted prior to completion of the policy attachment.
-  depends_on = [module.cloudtrail_s3_bucket]
+  depends_on = [module.cloudtrail_s3_bucket, aws_kms_key.cloudtrail]
   source     = "cloudposse/cloudtrail/aws"
   version    = "0.24.0"
 
@@ -314,6 +322,7 @@ module "cloudtrail" {
   enabled                       = local.enabled
   enable_logging                = true
   s3_bucket_name                = module.cloudtrail_s3_bucket[0].bucket_id
+  kms_key_arn                   = local.cloudtrail_kms_key_arn
 
   event_selector = [
     {

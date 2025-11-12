@@ -16,6 +16,18 @@ A second bucket is created for CloudTrail, and a CloudTrail is configured to mon
 
 Both buckets support object lock, with overridable defaults of COMPLIANCE mode and a duration of 7 days.
 
+### CloudTrail KMS Encryption
+
+By default, this component creates a KMS key to encrypt CloudTrail logs for compliance and security. The KMS encryption can be configured using these variables:
+
+- `cloudtrail_enable_kms_encryption` (default: `true`) - Enable/disable KMS encryption for CloudTrail logs
+- `cloudtrail_kms_key_arn` (default: `null`) - Provide an existing KMS key ARN to use instead of creating a new one
+- `cloudtrail_create_kms_key` (default: `true`) - Create a new KMS key when `cloudtrail_kms_key_arn` is not provided
+- `cloudtrail_kms_key_deletion_window_in_days` (default: `10`) - KMS key deletion window (7-30 days)
+- `cloudtrail_kms_key_enable_rotation` (default: `true`) - Enable automatic KMS key rotation
+
+The created KMS key includes the required policy statements for CloudTrail to encrypt logs and for authorized principals to decrypt them.
+
 Prerequisites
 - Datadog integration set up in the target environment
   - Relies on the Datadog API and App keys added by our Datadog integration component
