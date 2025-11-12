@@ -96,11 +96,6 @@ data "aws_iam_policy_document" "cloudtrail_kms_key_policy" {
       variable = "kms:CallerAccount"
       values   = [local.aws_account_id]
     }
-    condition {
-      test     = "StringEquals"
-      variable = "kms:ViaService"
-      values   = ["ec2.${var.region}.amazonaws.com"]
-    }
   }
 }
 
