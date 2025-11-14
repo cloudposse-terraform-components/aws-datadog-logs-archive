@@ -91,9 +91,9 @@ components:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.100.0 |
-| <a name="provider_datadog"></a> [datadog](#provider\_datadog) | 3.79.0 |
-| <a name="provider_http"></a> [http](#provider\_http) | 3.5.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.9.0, < 6.0.0 |
+| <a name="provider_datadog"></a> [datadog](#provider\_datadog) | >= 3.19 |
+| <a name="provider_http"></a> [http](#provider\_http) | >= 2.1.0 |
 
 ## Modules
 
