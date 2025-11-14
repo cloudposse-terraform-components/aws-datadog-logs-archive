@@ -95,4 +95,35 @@ variable "s3_force_destroy" {
   default     = false
 }
 
+variable "cloudtrail_enable_kms_encryption" {
+  type        = bool
+  description = "Enable KMS encryption for CloudTrail logs"
+  default     = true
+}
+
+variable "cloudtrail_kms_key_arn" {
+  type        = string
+  description = "ARN of an existing KMS key to use for CloudTrail log encryption. If not provided and cloudtrail_enable_kms_encryption is true, a new key will be created"
+  default     = null
+  nullable    = true
+}
+
+variable "cloudtrail_create_kms_key" {
+  type        = bool
+  description = "Create a new KMS key for CloudTrail encryption. Only used if cloudtrail_kms_key_arn is not provided and cloudtrail_enable_kms_encryption is true"
+  default     = true
+}
+
+variable "cloudtrail_kms_key_deletion_window_in_days" {
+  type        = number
+  description = "Duration in days after which the KMS key is deleted after destruction of the resource, must be between 7 and 30 days"
+  default     = 10
+}
+
+variable "cloudtrail_kms_key_enable_rotation" {
+  type        = bool
+  description = "Enable automatic rotation of the KMS key"
+  default     = true
+}
+
 

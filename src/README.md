@@ -27,6 +27,18 @@ Issues, Gotchas, Good-to-Knows
     1) Set `s3_force_destroy` to `true` and apply
     2) Set `enabled` to `false` and apply, or run `terraform destroy`
 
+## CloudTrail KMS Encryption
+
+By default, this component creates a KMS key to encrypt CloudTrail logs for compliance and security. The KMS encryption can be configured using these variables:
+
+- `cloudtrail_enable_kms_encryption` (default: `true`) - Enable/disable KMS encryption for CloudTrail logs
+- `cloudtrail_kms_key_arn` (default: `null`) - Provide an existing KMS key ARN to use instead of creating a new one
+- `cloudtrail_create_kms_key` (default: `true`) - Create a new KMS key when `cloudtrail_kms_key_arn` is not provided
+- `cloudtrail_kms_key_deletion_window_in_days` (default: `10`) - KMS key deletion window (7-30 days)
+- `cloudtrail_kms_key_enable_rotation` (default: `true`) - Enable automatic KMS key rotation
+
+The created KMS key includes the required policy statements for CloudTrail to encrypt logs and for authorized principals to decrypt them.
+
 ## Sponsorship
 
 <picture>
@@ -79,9 +91,9 @@ components:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.9.0, < 6.0.0 |
-| <a name="provider_datadog"></a> [datadog](#provider\_datadog) | >= 3.19 |
-| <a name="provider_http"></a> [http](#provider\_http) | >= 2.1.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.100.0 |
+| <a name="provider_datadog"></a> [datadog](#provider\_datadog) | 3.79.0 |
+| <a name="provider_http"></a> [http](#provider\_http) | 3.5.0 |
 
 ## Modules
 
@@ -100,10 +112,13 @@ components:
 
 | Name | Type |
 |------|------|
+| [aws_kms_alias.cloudtrail](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
+| [aws_kms_key.cloudtrail](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [datadog_logs_archive.catchall_archive](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/logs_archive) | resource |
 | [datadog_logs_archive.logs_archive](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/logs_archive) | resource |
 | [datadog_logs_archive_order.archive_order](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/logs_archive_order) | resource |
 | [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
+| [aws_iam_policy_document.cloudtrail_kms_key_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
 | [aws_ssm_parameter.datadog_aws_role_name](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ssm_parameter) | data source |
@@ -118,6 +133,11 @@ components:
 | <a name="input_archive_lifecycle_config"></a> [archive\_lifecycle\_config](#input\_archive\_lifecycle\_config) | Lifecycle configuration for the archive S3 bucket | <pre>object({<br/>    abort_incomplete_multipart_upload_days         = optional(number, null)<br/>    enable_glacier_transition                      = optional(bool, true)<br/>    glacier_transition_days                        = optional(number, 365)<br/>    noncurrent_version_glacier_transition_days     = optional(number, 30)<br/>    enable_deeparchive_transition                  = optional(bool, false)<br/>    deeparchive_transition_days                    = optional(number, 0)<br/>    noncurrent_version_deeparchive_transition_days = optional(number, 0)<br/>    enable_standard_ia_transition                  = optional(bool, false)<br/>    standard_transition_days                       = optional(number, 0)<br/>    expiration_days                                = optional(number, 0)<br/>    noncurrent_version_expiration_days             = optional(number, 0)<br/>  })</pre> | `{}` | no |
 | <a name="input_attributes"></a> [attributes](#input\_attributes) | ID element. Additional attributes (e.g. `workers` or `cluster`) to add to `id`,<br/>in the order they appear in the list. New attributes are appended to the<br/>end of the list. The elements of the list are joined by the `delimiter`<br/>and treated as a single ID element. | `list(string)` | `[]` | no |
 | <a name="input_catchall_enabled"></a> [catchall\_enabled](#input\_catchall\_enabled) | Set to true to enable a catchall for logs unmatched by any queries. This should only be used in one environment/account | `bool` | `false` | no |
+| <a name="input_cloudtrail_create_kms_key"></a> [cloudtrail\_create\_kms\_key](#input\_cloudtrail\_create\_kms\_key) | Create a new KMS key for CloudTrail encryption. Only used if cloudtrail\_kms\_key\_arn is not provided and cloudtrail\_enable\_kms\_encryption is true | `bool` | `true` | no |
+| <a name="input_cloudtrail_enable_kms_encryption"></a> [cloudtrail\_enable\_kms\_encryption](#input\_cloudtrail\_enable\_kms\_encryption) | Enable KMS encryption for CloudTrail logs | `bool` | `true` | no |
+| <a name="input_cloudtrail_kms_key_arn"></a> [cloudtrail\_kms\_key\_arn](#input\_cloudtrail\_kms\_key\_arn) | ARN of an existing KMS key to use for CloudTrail log encryption. If not provided and cloudtrail\_enable\_kms\_encryption is true, a new key will be created | `string` | `null` | no |
+| <a name="input_cloudtrail_kms_key_deletion_window_in_days"></a> [cloudtrail\_kms\_key\_deletion\_window\_in\_days](#input\_cloudtrail\_kms\_key\_deletion\_window\_in\_days) | Duration in days after which the KMS key is deleted after destruction of the resource, must be between 7 and 30 days | `number` | `10` | no |
+| <a name="input_cloudtrail_kms_key_enable_rotation"></a> [cloudtrail\_kms\_key\_enable\_rotation](#input\_cloudtrail\_kms\_key\_enable\_rotation) | Enable automatic rotation of the KMS key | `bool` | `true` | no |
 | <a name="input_cloudtrail_lifecycle_config"></a> [cloudtrail\_lifecycle\_config](#input\_cloudtrail\_lifecycle\_config) | Lifecycle configuration for the cloudtrail S3 bucket | <pre>object({<br/>    abort_incomplete_multipart_upload_days         = optional(number, null)<br/>    enable_glacier_transition                      = optional(bool, true)<br/>    glacier_transition_days                        = optional(number, 365)<br/>    noncurrent_version_glacier_transition_days     = optional(number, 365)<br/>    enable_deeparchive_transition                  = optional(bool, false)<br/>    deeparchive_transition_days                    = optional(number, 0)<br/>    noncurrent_version_deeparchive_transition_days = optional(number, 0)<br/>    enable_standard_ia_transition                  = optional(bool, false)<br/>    standard_transition_days                       = optional(number, 0)<br/>    expiration_days                                = optional(number, 0)<br/>    noncurrent_version_expiration_days             = optional(number, 0)<br/>  })</pre> | `{}` | no |
 | <a name="input_context"></a> [context](#input\_context) | Single object for setting entire context at once.<br/>See description of individual variables for details.<br/>Leave string and numeric variables as `null` to use default value.<br/>Individual variable settings (non-null) override settings in context object,<br/>except for attributes, tags, and additional\_tag\_map, which are merged. | `any` | <pre>{<br/>  "additional_tag_map": {},<br/>  "attributes": [],<br/>  "delimiter": null,<br/>  "descriptor_formats": {},<br/>  "enabled": true,<br/>  "environment": null,<br/>  "id_length_limit": null,<br/>  "label_key_case": null,<br/>  "label_order": [],<br/>  "label_value_case": null,<br/>  "labels_as_tags": [<br/>    "unset"<br/>  ],<br/>  "name": null,<br/>  "namespace": null,<br/>  "regex_replace_chars": null,<br/>  "stage": null,<br/>  "tags": {},<br/>  "tenant": null<br/>}</pre> | no |
 | <a name="input_delimiter"></a> [delimiter](#input\_delimiter) | Delimiter to be used between ID elements.<br/>Defaults to `-` (hyphen). Set to `""` to use no delimiter at all. | `string` | `null` | no |
@@ -157,6 +177,9 @@ components:
 | <a name="output_cloudtrail_bucket_arn"></a> [cloudtrail\_bucket\_arn](#output\_cloudtrail\_bucket\_arn) | The ARN of the bucket used for access logging via cloudtrail |
 | <a name="output_cloudtrail_bucket_domain_name"></a> [cloudtrail\_bucket\_domain\_name](#output\_cloudtrail\_bucket\_domain\_name) | The FQDN of the bucket used for access logging via cloudtrail |
 | <a name="output_cloudtrail_bucket_id"></a> [cloudtrail\_bucket\_id](#output\_cloudtrail\_bucket\_id) | The ID (name) of the bucket used for access logging via cloudtrail |
+| <a name="output_cloudtrail_kms_key_alias"></a> [cloudtrail\_kms\_key\_alias](#output\_cloudtrail\_kms\_key\_alias) | The alias of the KMS key used for CloudTrail log encryption (only if created by this module) |
+| <a name="output_cloudtrail_kms_key_arn"></a> [cloudtrail\_kms\_key\_arn](#output\_cloudtrail\_kms\_key\_arn) | The ARN of the KMS key used for CloudTrail log encryption |
+| <a name="output_cloudtrail_kms_key_id"></a> [cloudtrail\_kms\_key\_id](#output\_cloudtrail\_kms\_key\_id) | The ID of the KMS key used for CloudTrail log encryption (only if created by this module) |
 <!-- markdownlint-restore -->
 
 

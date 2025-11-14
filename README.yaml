@@ -22,6 +22,18 @@ description: |-
       1) Set `s3_force_destroy` to `true` and apply
       2) Set `enabled` to `false` and apply, or run `terraform destroy`
 
+  ## CloudTrail KMS Encryption
+
+  By default, this component creates a KMS key to encrypt CloudTrail logs for compliance and security. The KMS encryption can be configured using these variables:
+
+  - `cloudtrail_enable_kms_encryption` (default: `true`) - Enable/disable KMS encryption for CloudTrail logs
+  - `cloudtrail_kms_key_arn` (default: `null`) - Provide an existing KMS key ARN to use instead of creating a new one
+  - `cloudtrail_create_kms_key` (default: `true`) - Create a new KMS key when `cloudtrail_kms_key_arn` is not provided
+  - `cloudtrail_kms_key_deletion_window_in_days` (default: `10`) - KMS key deletion window (7-30 days)
+  - `cloudtrail_kms_key_enable_rotation` (default: `true`) - Enable automatic KMS key rotation
+
+  The created KMS key includes the required policy statements for CloudTrail to encrypt logs and for authorized principals to decrypt them.
+
   ## Sponsorship
 
   <picture>
