@@ -5,6 +5,9 @@ locals {
   aws_account_id = join("", data.aws_caller_identity.current.*.account_id)
   aws_partition  = join("", data.aws_partition.current.*.partition)
 
+  access_log_bucket_enabled = local.enabled && (var.create_access_log_bucket || var.access_log_bucket_name != "")
+  access_log_bucket_name    = var.create_access_log_bucket ? one(module.cloudtrail_access_log_bucket[*].bucket_id) : var.access_log_bucket_name
+
   datadog_aws_role_name = nonsensitive(join("", data.aws_ssm_parameter.datadog_aws_role_name.*.value))
   principal_names = [
     format("arn:${local.aws_partition}:iam::%s:role/${local.datadog_aws_role_name}", local.aws_account_id),
@@ -236,6 +239,40 @@ module "cloudtrail_bucket_label" {
   context = module.this.context
 }
 
+module "cloudtrail_access_log_bucket_label" {
+  source  = "cloudposse/label/null"
+  version = "0.25.0"
+
+  name       = "datadog-logs-archive-cloudtrail"
+  attributes = ["access-logs"]
+  context    = module.this.context
+}
+
+module "cloudtrail_access_log_bucket" {
+  source  = "cloudposse/s3-bucket/aws"
+  version = "4.10.0"
+
+  count = local.enabled && var.create_access_log_bucket ? 1 : 0
+
+  acl           = "log-delivery-write"
+  enabled       = local.enabled
+  force_destroy = var.s3_force_destroy
+
+  tags = {
+    managed-by = "terraform"
+    env        = var.stage
+    service    = "datadog-logs-archive"
+    part-of    = "observability"
+  }
+
+  user_enabled       = false
+  versioning_enabled = true
+
+  label_key_case   = "lower"
+  label_value_case = "lower"
+
+  context = module.cloudtrail_access_log_bucket_label.context
+}
 
 module "cloudtrail_s3_bucket" {
   source  = "cloudposse/s3-bucket/aws"
@@ -301,6 +338,13 @@ module "cloudtrail_s3_bucket" {
   # https://stackoverflow.com/questions/69986387/s3-bucket-terraform-plan-shows-inexistent-changes-on-default-values
   # https://github.com/hashicorp/terraform/issues/5613
   allow_ssl_requests_only = false
+
+  logging = local.access_log_bucket_enabled ? [
+    {
+      bucket_name = local.access_log_bucket_name
+      prefix      = "logs/${module.cloudtrail_bucket_label.id}/"
+    }
+  ] : []
 
   context = module.cloudtrail_bucket_label.context
 }
