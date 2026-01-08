@@ -57,3 +57,18 @@ output "cloudtrail_kms_key_alias" {
   value       = local.enabled && var.cloudtrail_enable_kms_encryption && var.cloudtrail_create_kms_key && var.cloudtrail_kms_key_arn == null ? aws_kms_alias.cloudtrail[0].name : ""
   description = "The alias of the KMS key used for CloudTrail log encryption (only if created by this module)"
 }
+
+output "access_log_bucket_id" {
+  value       = local.enabled && var.create_access_log_bucket ? module.cloudtrail_access_log_bucket[0].bucket_id : ""
+  description = "The ID (name) of the bucket used for CloudTrail bucket access logs"
+}
+
+output "access_log_bucket_arn" {
+  value       = local.enabled && var.create_access_log_bucket ? module.cloudtrail_access_log_bucket[0].bucket_arn : ""
+  description = "The ARN of the bucket used for CloudTrail bucket access logs"
+}
+
+output "access_log_bucket_domain_name" {
+  value       = local.enabled && var.create_access_log_bucket ? module.cloudtrail_access_log_bucket[0].bucket_domain_name : ""
+  description = "The FQDN of the bucket used for CloudTrail bucket access logs"
+}
