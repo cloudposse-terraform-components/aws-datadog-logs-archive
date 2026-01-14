@@ -5,8 +5,8 @@ locals {
   aws_account_id = join("", data.aws_caller_identity.current.*.account_id)
   aws_partition  = join("", data.aws_partition.current.*.partition)
 
-  access_log_bucket_enabled = local.enabled && (var.create_access_log_bucket || var.access_log_bucket_name != "")
-  access_log_bucket_name    = var.create_access_log_bucket ? one(module.cloudtrail_access_log_bucket[*].bucket_id) : var.access_log_bucket_name
+  create_access_log_bucket = local.enabled && (var.access_log_bucket_enabled || var.access_log_bucket_name != "")
+  access_log_bucket_name   = var.access_log_bucket_enabled ? one(module.cloudtrail_access_log_bucket[*].bucket_id) : var.access_log_bucket_name
 
   datadog_aws_role_name = nonsensitive(join("", data.aws_ssm_parameter.datadog_aws_role_name.*.value))
   principal_names = [
@@ -252,7 +252,7 @@ module "cloudtrail_access_log_bucket" {
   source  = "cloudposse/s3-bucket/aws"
   version = "4.10.0"
 
-  count = local.enabled && var.create_access_log_bucket ? 1 : 0
+  count = local.enabled && var.access_log_bucket_enabled ? 1 : 0
 
   acl           = "log-delivery-write"
   enabled       = local.enabled
@@ -339,7 +339,7 @@ module "cloudtrail_s3_bucket" {
   # https://github.com/hashicorp/terraform/issues/5613
   allow_ssl_requests_only = false
 
-  logging = local.access_log_bucket_enabled ? [
+  logging = local.create_access_log_bucket ? [
     {
       bucket_name = local.access_log_bucket_name
       prefix      = "logs/${module.cloudtrail_bucket_label.id}/"

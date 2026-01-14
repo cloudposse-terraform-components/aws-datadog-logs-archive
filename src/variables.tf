@@ -126,7 +126,7 @@ variable "cloudtrail_kms_key_enable_rotation" {
   default     = true
 }
 
-variable "create_access_log_bucket" {
+variable "access_log_bucket_enabled" {
   type        = bool
   description = "Whether to create a dedicated S3 bucket for CloudTrail bucket access logs"
   default     = false
@@ -134,6 +134,6 @@ variable "create_access_log_bucket" {
 
 variable "access_log_bucket_name" {
   type        = string
-  description = "Name of existing S3 bucket to use for CloudTrail bucket access logs. Only used when create_access_log_bucket is false"
+  description = "Name of existing S3 bucket to use for CloudTrail bucket access logs. Only used when access_log_bucket_enabled is false"
   default     = ""
 }
