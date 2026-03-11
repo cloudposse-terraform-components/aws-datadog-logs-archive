@@ -2,13 +2,13 @@
 locals {
   enabled = module.this.enabled
 
-  aws_account_id = join("", data.aws_caller_identity.current.*.account_id)
-  aws_partition  = join("", data.aws_partition.current.*.partition)
+  aws_account_id = join("", data.aws_caller_identity.current[*].account_id)
+  aws_partition  = join("", data.aws_partition.current[*].partition)
 
   create_access_log_bucket = local.enabled && (var.access_log_bucket_enabled || var.access_log_bucket_name != "")
   access_log_bucket_name   = var.access_log_bucket_enabled ? one(module.cloudtrail_access_log_bucket[*].bucket_id) : var.access_log_bucket_name
 
-  datadog_aws_role_name = nonsensitive(join("", data.aws_ssm_parameter.datadog_aws_role_name.*.value))
+  datadog_aws_role_name = nonsensitive(join("", data.aws_ssm_parameter.datadog_aws_role_name[*].value))
   principal_names = [
     format("arn:${local.aws_partition}:iam::%s:role/${local.datadog_aws_role_name}", local.aws_account_id),
   ]
@@ -20,7 +20,7 @@ locals {
   ]
 
   # in case enabled: false and we have no current order to lookup
-  data_current_order_body = one(data.http.current_order.*.response_body) == null ? {} : jsondecode(data.http.current_order[0].response_body)
+  data_current_order_body = one(data.http.current_order[*].response_body) == null ? {} : jsondecode(data.http.current_order[0].response_body)
   # in case there is no response (valid http request but no existing data)
   current_order_data = lookup(local.data_current_order_body, "data", null)
 
@@ -155,7 +155,7 @@ module "bucket_policy" {
   source  = "cloudposse/iam-policy/aws"
   version = "2.0.2"
 
-  iam_policy_statements = try(lookup(local.policy, "Statement"), null)
+  iam_policy_statements = try(local.policy["Statement"], null)
 
   context = module.this.context
 }
@@ -286,7 +286,7 @@ module "cloudtrail_s3_bucket" {
   enabled       = local.enabled
   force_destroy = var.s3_force_destroy
 
-  source_policy_documents = data.aws_iam_policy_document.default.*.json
+  source_policy_documents = data.aws_iam_policy_document.default[*].json
 
   lifecycle_rules = [
     {
