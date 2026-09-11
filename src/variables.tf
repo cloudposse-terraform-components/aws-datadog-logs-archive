@@ -33,6 +33,7 @@ variable "archive_lifecycle_config" {
     abort_incomplete_multipart_upload_days         = optional(number, null)
     enable_glacier_transition                      = optional(bool, true)
     glacier_transition_days                        = optional(number, 365)
+    glacier_transition_storage_class               = optional(string, "GLACIER_IR")
     noncurrent_version_glacier_transition_days     = optional(number, 30)
     enable_deeparchive_transition                  = optional(bool, false)
     deeparchive_transition_days                    = optional(number, 0)
@@ -44,6 +45,11 @@ variable "archive_lifecycle_config" {
   })
   description = "Lifecycle configuration for the archive S3 bucket"
   default     = {}
+
+  validation {
+    condition     = contains(["GLACIER_IR", "GLACIER"], var.archive_lifecycle_config.glacier_transition_storage_class)
+    error_message = "glacier_transition_storage_class must be GLACIER_IR or GLACIER. Datadog cannot read GLACIER (S3 Glacier Flexible Retrieval) for Rehydration or Archive Search, because those objects require s3:RestoreObject first and the archive role is not granted that action. Use GLACIER_IR unless the archive never needs to be read back."
+  }
 }
 
 variable "cloudtrail_lifecycle_config" {
