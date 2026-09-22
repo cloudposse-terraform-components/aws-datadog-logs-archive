@@ -26,7 +26,7 @@ spec:
 
     - component: "aws-datadog-integration"
       source: github.com/cloudposse-terraform-components/aws-datadog-integration.git//src?ref={{.Version}}
-      version: v1.535.15
+      version: v2.0.0
       targets:
         - "components/terraform/datadog-integration"
       included_paths:
