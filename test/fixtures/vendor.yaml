@@ -8,7 +8,7 @@ spec:
     # https://github.com/cloudposse-terraform-components/aws-account-map
     - component: "account-map"
       source: github.com/cloudposse-terraform-components/aws-account-map.git//src?ref={{.Version}}
-      version: v1.535.2
+      version: v1.537.2
       targets:
         - "components/terraform/account-map"
       included_paths:
@@ -17,7 +17,7 @@ spec:
 
     - component: "datadog-configuration"
       source: github.com/cloudposse-terraform-components/aws-datadog-credentials.git//src?ref={{.Version}}
-      version: v1.535.11
+      version: v2.1.0
       targets:
         - "components/terraform/datadog-configuration"
       included_paths:
@@ -26,7 +26,7 @@ spec:
 
     - component: "aws-datadog-integration"
       source: github.com/cloudposse-terraform-components/aws-datadog-integration.git//src?ref={{.Version}}
-      version: v1.535.15
+      version: v2.0.0
       targets:
         - "components/terraform/datadog-integration"
       included_paths:
