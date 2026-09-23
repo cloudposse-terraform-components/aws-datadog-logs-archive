@@ -8,3 +8,6 @@ components:
         name: datadog-logs-archive
         object_lock_days_archive: 0
         object_lock_days_cloudtrail: 0
+        # Allow terratest to fully tear down the versioned archive/cloudtrail buckets.
+        # Without this, destroy fails with BucketNotEmpty and orphans test state.
+        s3_force_destroy: true
