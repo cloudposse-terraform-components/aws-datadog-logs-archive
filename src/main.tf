@@ -34,6 +34,49 @@ locals {
   catchall_id      = local.enabled ? [for x in local.current_order_data : x.id if x.attributes.name == local.catchall_archive_name] : []
   ordered_ids      = concat(local.non_catchall_ids, local.catchall_id)
 
+  # The archive bucket's lifecycle rule is built against the s3-bucket module's
+  # `lifecycle_configuration_rules` input rather than the deprecated `lifecycle_rules` input,
+  # because the latter hardcodes the Glacier transition to the GLACIER storage class
+  # (S3 Glacier Flexible Retrieval). Datadog cannot read GLACIER: neither Rehydration nor
+  # Archive Search supports a storage class that requires s3:RestoreObject first, and the
+  # archive role created here is granted only s3:GetObject, s3:PutObject and s3:ListBucket.
+  # Restoring the objects out of band does not help either, because an object's storage class
+  # stays GLACIER while a temporary restored copy exists. Objects that transition to GLACIER
+  # are therefore permanently unreadable from Datadog, which defeats the purpose of the
+  # archive. The Datadog provider reflects this in `datadog_logs_archive.storage_class`, whose
+  # accepted values are STANDARD, STANDARD_IA, ONEZONE_IA, INTELLIGENT_TIERING and GLACIER_IR.
+  #
+  # These two locals reproduce the module's own translation of the deprecated flags, with the
+  # single difference that the Glacier storage class is configurable and defaults to
+  # GLACIER_IR (S3 Glacier Instant Retrieval), which Datadog does support.
+  archive_transitions = concat(
+    var.archive_lifecycle_config.enable_standard_ia_transition != true ? [] : [{
+      days          = var.archive_lifecycle_config.standard_transition_days
+      storage_class = "STANDARD_IA"
+    }],
+    var.archive_lifecycle_config.enable_glacier_transition != true ? [] : [{
+      days          = var.archive_lifecycle_config.glacier_transition_days
+      storage_class = var.archive_lifecycle_config.glacier_transition_storage_class
+    }],
+    var.archive_lifecycle_config.enable_deeparchive_transition != true ? [] : [{
+      days          = var.archive_lifecycle_config.deeparchive_transition_days
+      storage_class = "DEEP_ARCHIVE"
+    }],
+  )
+
+  # As with the deprecated input, enabling a transition enables it for both the current and
+  # the noncurrent versions of an object.
+  archive_noncurrent_version_transitions = concat(
+    var.archive_lifecycle_config.enable_glacier_transition != true ? [] : [{
+      noncurrent_days = var.archive_lifecycle_config.noncurrent_version_glacier_transition_days
+      storage_class   = var.archive_lifecycle_config.glacier_transition_storage_class
+    }],
+    var.archive_lifecycle_config.enable_deeparchive_transition != true ? [] : [{
+      noncurrent_days = var.archive_lifecycle_config.noncurrent_version_deeparchive_transition_days
+      storage_class   = "DEEP_ARCHIVE"
+    }],
+  )
+
   policy = local.enabled ? jsondecode(data.aws_iam_policy_document.default[0].json) : null
 
   # default datadog_logs_archive query.
@@ -188,25 +231,27 @@ module "archive_bucket" {
   enabled       = local.enabled
   force_destroy = var.s3_force_destroy
 
-  lifecycle_rules = [
+  lifecycle_configuration_rules = [
     {
-      prefix  = null
+      # "rule-1" is the id the deprecated `lifecycle_rules` input generates for the first
+      # rule, so buckets created before this component moved to
+      # `lifecycle_configuration_rules` get an in-place update of the existing rule rather
+      # than a rule replacement.
+      id      = "rule-1"
       enabled = var.lifecycle_rules_enabled
-      tags    = {}
 
-      abort_incomplete_multipart_upload_days         = var.archive_lifecycle_config.abort_incomplete_multipart_upload_days
-      enable_glacier_transition                      = var.archive_lifecycle_config.enable_glacier_transition
-      glacier_transition_days                        = var.archive_lifecycle_config.glacier_transition_days
-      noncurrent_version_glacier_transition_days     = var.archive_lifecycle_config.noncurrent_version_glacier_transition_days
-      enable_deeparchive_transition                  = var.archive_lifecycle_config.enable_deeparchive_transition
-      deeparchive_transition_days                    = var.archive_lifecycle_config.deeparchive_transition_days
-      noncurrent_version_deeparchive_transition_days = var.archive_lifecycle_config.noncurrent_version_deeparchive_transition_days
-      enable_standard_ia_transition                  = var.archive_lifecycle_config.enable_standard_ia_transition
-      standard_transition_days                       = var.archive_lifecycle_config.standard_transition_days
-      enable_current_object_expiration               = var.archive_lifecycle_config.expiration_days > 0
-      expiration_days                                = var.archive_lifecycle_config.expiration_days
-      enable_noncurrent_version_expiration           = var.archive_lifecycle_config.noncurrent_version_expiration_days > 0
-      noncurrent_version_expiration_days             = var.archive_lifecycle_config.noncurrent_version_expiration_days
+      abort_incomplete_multipart_upload_days = var.archive_lifecycle_config.abort_incomplete_multipart_upload_days
+
+      expiration = var.archive_lifecycle_config.expiration_days > 0 ? {
+        days = var.archive_lifecycle_config.expiration_days
+      } : null
+
+      noncurrent_version_expiration = var.archive_lifecycle_config.noncurrent_version_expiration_days > 0 ? {
+        noncurrent_days = var.archive_lifecycle_config.noncurrent_version_expiration_days
+      } : null
+
+      transition                    = local.archive_transitions
+      noncurrent_version_transition = local.archive_noncurrent_version_transitions
     },
   ]
 
