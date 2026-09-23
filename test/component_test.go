@@ -8,8 +8,6 @@ import (
 
 	helper "github.com/cloudposse/test-helpers/pkg/atmos/component-helper"
 	awsTerratest "github.com/gruntwork-io/terratest/modules/aws"
-	"github.com/cloudposse/test-helpers/pkg/atmos"
-	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/stretchr/testify/assert"
 )
@@ -50,14 +48,9 @@ func (s *ComponentSuite) TestBasic() {
 	options, _ := s.DeployAtmosComponent(s.T(), component, stack, nil)
 	assert.NotNil(s.T(), options)
 
-	cloudtrailBucketName := atmos.Output(s.T(), options, "cloudtrail_bucket_id")
-
-	defer func() {
-		if !s.Config.SkipDestroyComponent {
-			atmos.DestroyE(s.T(), options)
-			aws.EmptyS3Bucket(s.T(), awsRegion, cloudtrailBucketName)
-		}
-	}()
+	// The buckets set `s3_force_destroy = true` in the fixture, so `terraform destroy`
+	// empties and deletes them. No manual bucket emptying is needed here (and calling
+	// EmptyS3Bucket after destroy would fail with a 404 on the already-deleted bucket).
 
 	s.DriftTest(component, stack, nil)
 }

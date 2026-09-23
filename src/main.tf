@@ -24,8 +24,14 @@ locals {
   # in case there is no response (valid http request but no existing data)
   current_order_data = lookup(local.data_current_order_body, "data", null)
 
-  non_catchall_ids = local.enabled ? [for x in local.current_order_data : x.id if x.attributes.name != "catchall"] : []
-  catchall_id      = local.enabled ? [for x in local.current_order_data : x.id if x.attributes.name == "catchall"] : []
+  # Datadog logs archive names must be globally unique within a Datadog organization.
+  # Default to the module ID (namespace-tenant-environment-stage-name-attributes) instead of the
+  # bare stage, which collides across stacks, environments, and CI runs sharing a Datadog org.
+  archive_name          = var.archive_name != null ? var.archive_name : module.this.id
+  catchall_archive_name = var.catchall_archive_name != null ? var.catchall_archive_name : "${module.this.id}-catchall"
+
+  non_catchall_ids = local.enabled ? [for x in local.current_order_data : x.id if x.attributes.name != local.catchall_archive_name] : []
+  catchall_id      = local.enabled ? [for x in local.current_order_data : x.id if x.attributes.name == local.catchall_archive_name] : []
   ordered_ids      = concat(local.non_catchall_ids, local.catchall_id)
 
   # The archive bucket's lifecycle rule is built against the s3-bucket module's
@@ -437,7 +443,7 @@ resource "datadog_logs_archive_order" "archive_order" {
 resource "datadog_logs_archive" "logs_archive" {
   count = local.enabled ? 1 : 0
 
-  name             = var.stage
+  name             = local.archive_name
   include_tags     = true
   rehydration_tags = ["rehydrated:true"]
   query            = local.query
@@ -454,7 +460,7 @@ resource "datadog_logs_archive" "catchall_archive" {
   count = local.enabled && var.catchall_enabled ? 1 : 0
 
   depends_on       = [datadog_logs_archive.logs_archive]
-  name             = "catchall"
+  name             = local.catchall_archive_name
   include_tags     = true
   rehydration_tags = ["rehydrated:true"]
   query            = "*"

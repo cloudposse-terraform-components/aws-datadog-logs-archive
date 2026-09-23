@@ -10,6 +10,13 @@ variable "query_override" {
   default     = null
 }
 
+variable "archive_name" {
+  type        = string
+  nullable    = true
+  description = "Name of the Datadog logs archive. Datadog logs archive names must be unique within a Datadog organization, so this defaults to the globally unique module ID (`module.this.id`) when null."
+  default     = null
+}
+
 variable "additional_query_tags" {
   type        = list(any)
   description = "Additional tags to be used in the query for this archive"
@@ -20,6 +27,13 @@ variable "catchall_enabled" {
   type        = bool
   description = "Set to true to enable a catchall for logs unmatched by any queries. This should only be used in one environment/account"
   default     = false
+}
+
+variable "catchall_archive_name" {
+  type        = string
+  nullable    = true
+  description = "Name of the catchall Datadog logs archive. Datadog logs archive names must be unique within a Datadog organization, so this defaults to `<module.this.id>-catchall` when null."
+  default     = null
 }
 
 variable "lifecycle_rules_enabled" {
