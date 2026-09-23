@@ -81,7 +81,7 @@ components:
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.9.0, < 6.0.0 |
 | <a name="requirement_datadog"></a> [datadog](#requirement\_datadog) | >= 3.19 |
@@ -90,7 +90,7 @@ components:
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.9.0, < 6.0.0 |
 | <a name="provider_datadog"></a> [datadog](#provider\_datadog) | >= 3.19 |
 | <a name="provider_http"></a> [http](#provider\_http) | >= 2.1.0 |
@@ -98,7 +98,7 @@ components:
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_archive_bucket"></a> [archive\_bucket](#module\_archive\_bucket) | cloudposse/s3-bucket/aws | 4.11.0 |
 | <a name="module_bucket_policy"></a> [bucket\_policy](#module\_bucket\_policy) | cloudposse/iam-policy/aws | 2.0.2 |
 | <a name="module_cloudtrail"></a> [cloudtrail](#module\_cloudtrail) | cloudposse/cloudtrail/aws | 0.24.0 |
@@ -113,7 +113,7 @@ components:
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [aws_kms_alias.cloudtrail](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
 | [aws_kms_key.cloudtrail](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [datadog_logs_archive.catchall_archive](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/logs_archive) | resource |
@@ -129,13 +129,15 @@ components:
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_access_log_bucket_enabled"></a> [access\_log\_bucket\_enabled](#input\_access\_log\_bucket\_enabled) | Whether to create a dedicated S3 bucket for CloudTrail bucket access logs | `bool` | `false` | no |
 | <a name="input_access_log_bucket_name"></a> [access\_log\_bucket\_name](#input\_access\_log\_bucket\_name) | Name of existing S3 bucket to use for CloudTrail bucket access logs. Only used when access\_log\_bucket\_enabled is false | `string` | `""` | no |
 | <a name="input_additional_query_tags"></a> [additional\_query\_tags](#input\_additional\_query\_tags) | Additional tags to be used in the query for this archive | `list(any)` | `[]` | no |
 | <a name="input_additional_tag_map"></a> [additional\_tag\_map](#input\_additional\_tag\_map) | Additional key-value pairs to add to each map in `tags_as_list_of_maps`. Not added to `tags` or `id`.<br/>This is for some rare cases where resources want additional configuration of tags<br/>and therefore take a list of maps with tag key, value, and additional configuration. | `map(string)` | `{}` | no |
 | <a name="input_archive_lifecycle_config"></a> [archive\_lifecycle\_config](#input\_archive\_lifecycle\_config) | Lifecycle configuration for the archive S3 bucket | <pre>object({<br/>    abort_incomplete_multipart_upload_days         = optional(number, null)<br/>    enable_glacier_transition                      = optional(bool, true)<br/>    glacier_transition_days                        = optional(number, 365)<br/>    noncurrent_version_glacier_transition_days     = optional(number, 30)<br/>    enable_deeparchive_transition                  = optional(bool, false)<br/>    deeparchive_transition_days                    = optional(number, 0)<br/>    noncurrent_version_deeparchive_transition_days = optional(number, 0)<br/>    enable_standard_ia_transition                  = optional(bool, false)<br/>    standard_transition_days                       = optional(number, 0)<br/>    expiration_days                                = optional(number, 0)<br/>    noncurrent_version_expiration_days             = optional(number, 0)<br/>  })</pre> | `{}` | no |
+| <a name="input_archive_name"></a> [archive\_name](#input\_archive\_name) | Name of the Datadog logs archive. Datadog logs archive names must be unique within a Datadog organization, so this defaults to the globally unique module ID (`module.this.id`) when null. | `string` | `null` | no |
 | <a name="input_attributes"></a> [attributes](#input\_attributes) | ID element. Additional attributes (e.g. `workers` or `cluster`) to add to `id`,<br/>in the order they appear in the list. New attributes are appended to the<br/>end of the list. The elements of the list are joined by the `delimiter`<br/>and treated as a single ID element. | `list(string)` | `[]` | no |
+| <a name="input_catchall_archive_name"></a> [catchall\_archive\_name](#input\_catchall\_archive\_name) | Name of the catchall Datadog logs archive. Datadog logs archive names must be unique within a Datadog organization, so this defaults to `<module.this.id>-catchall` when null. | `string` | `null` | no |
 | <a name="input_catchall_enabled"></a> [catchall\_enabled](#input\_catchall\_enabled) | Set to true to enable a catchall for logs unmatched by any queries. This should only be used in one environment/account | `bool` | `false` | no |
 | <a name="input_cloudtrail_create_kms_key"></a> [cloudtrail\_create\_kms\_key](#input\_cloudtrail\_create\_kms\_key) | Create a new KMS key for CloudTrail encryption. Only used if cloudtrail\_kms\_key\_arn is not provided and cloudtrail\_enable\_kms\_encryption is true | `bool` | `true` | no |
 | <a name="input_cloudtrail_enable_kms_encryption"></a> [cloudtrail\_enable\_kms\_encryption](#input\_cloudtrail\_enable\_kms\_encryption) | Enable KMS encryption for CloudTrail logs | `bool` | `true` | no |
@@ -171,7 +173,7 @@ components:
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_access_log_bucket_arn"></a> [access\_log\_bucket\_arn](#output\_access\_log\_bucket\_arn) | The ARN of the bucket used for CloudTrail bucket access logs |
 | <a name="output_access_log_bucket_domain_name"></a> [access\_log\_bucket\_domain\_name](#output\_access\_log\_bucket\_domain\_name) | The FQDN of the bucket used for CloudTrail bucket access logs |
 | <a name="output_access_log_bucket_id"></a> [access\_log\_bucket\_id](#output\_access\_log\_bucket\_id) | The ID (name) of the bucket used for CloudTrail bucket access logs |
