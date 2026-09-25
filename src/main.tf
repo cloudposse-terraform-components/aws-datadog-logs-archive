@@ -223,7 +223,7 @@ data "aws_partition" "current" {
 
 module "archive_bucket" {
   source  = "cloudposse/s3-bucket/aws"
-  version = "4.11.0"
+  version = "4.15.0"
 
   count = local.enabled ? 1 : 0
 
@@ -301,7 +301,7 @@ module "cloudtrail_access_log_bucket_label" {
 
 module "cloudtrail_access_log_bucket" {
   source  = "cloudposse/s3-bucket/aws"
-  version = "4.11.0"
+  version = "4.15.0"
 
   count = local.enabled && var.access_log_bucket_enabled ? 1 : 0
 
@@ -327,7 +327,7 @@ module "cloudtrail_access_log_bucket" {
 
 module "cloudtrail_s3_bucket" {
   source  = "cloudposse/s3-bucket/aws"
-  version = "4.11.0"
+  version = "4.15.0"
 
   depends_on = [data.aws_iam_policy_document.default]
 
