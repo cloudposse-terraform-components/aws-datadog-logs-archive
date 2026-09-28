@@ -45,7 +45,11 @@ description: |-
 
   Partitioning is worth more than it first appears. Datadog applies the query filter after the matching files are downloaded, so scan size is driven by the length of the searched time range rather than by how selective the query is: a narrow filter over a wide window still scans the whole window. Partition attributes are the only mechanism that prunes files before download.
 
-  All four are forward-only. Only logs archived after the setting is applied are affected, and objects already written cannot be retrofitted. Changing `compression_method` on an existing archive only affects new files; objects already stored keep their original format and stay readable, since the two formats use different extensions.
+  `compression_method`, `partitioning_attributes` and `lookup_attributes` are forward-only: they change how Datadog writes objects, so only logs archived after the setting is applied are affected and objects already written cannot be retrofitted. Changing `compression_method` on an existing archive only affects new files; objects already stored keep their original format and stay readable, since the two formats use different extensions.
+
+  `rehydration_max_scan_size_in_gb` is not forward-only. It is applied at query time, so it bounds every subsequent Archive Search and rehydration job, including jobs that read objects written before the limit was set.
+
+  These settings require the Datadog provider `>= 4.13.0`, the first release carrying all four attributes.
 
   ## Sponsorship
 
