@@ -61,19 +61,6 @@ By default, this component creates a KMS key to encrypt CloudTrail logs for comp
 
 The created KMS key includes the required policy statements for CloudTrail to encrypt logs and for authorized principals to decrypt them.
 
-## Archive Tuning
-
-Four settings control how Datadog writes the archive and how much a search or rehydration is allowed to read back:
-
-- `compression_method` (default: `ZSTD`) - Compression Datadog uses when writing objects, either `ZSTD` or `GZIP`. `ZSTD` is the default and the recommendation in the Datadog console, especially where Archive Search is used: the objects are smaller, so they cost less to store, less to scan, and less in egress from the archive bucket. Note the Datadog provider itself defaults to `GZIP`.
-- `partitioning_attributes` (default: `null`) - Up to two low cardinality attributes used as partition keys, most frequently queried first. Logs sharing a partition value are co-located, so a search can skip partitions that cannot match before downloading them.
-- `lookup_attributes` (default: `null`) - Up to two high cardinality attributes, such as a trace, container or user ID, used to pinpoint individual logs within a data block.
-- `rehydration_max_scan_size_in_gb` (default: `null`) - Maximum volume, in GB, that a single job may scan against this archive. Despite the field name, which predates Archive Search, this one setting caps Archive Search queries and rehydration jobs alike. Left unset, a single wide search can scan the entire archive.
-
-Partitioning is worth more than it first appears. Datadog applies the query filter after the matching files are downloaded, so scan size is driven by the length of the searched time range rather than by how selective the query is: a narrow filter over a wide window still scans the whole window. Partition attributes are the only mechanism that prunes files before download.
-
-All four are forward-only. Only logs archived after the setting is applied are affected, and objects already written cannot be retrofitted. Changing `compression_method` on an existing archive only affects new files; objects already stored keep their original format and stay readable, since the two formats use different extensions.
-
 ## Sponsorship
 
 <picture>
@@ -145,7 +132,7 @@ components:
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.9.0, < 6.0.0 |
 | <a name="requirement_datadog"></a> [datadog](#requirement\_datadog) | >= 3.19 |
@@ -154,7 +141,7 @@ components:
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.9.0, < 6.0.0 |
 | <a name="provider_datadog"></a> [datadog](#provider\_datadog) | >= 3.19 |
 | <a name="provider_http"></a> [http](#provider\_http) | >= 2.1.0 |
@@ -162,7 +149,7 @@ components:
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_archive_bucket"></a> [archive\_bucket](#module\_archive\_bucket) | cloudposse/s3-bucket/aws | 4.11.0 |
 | <a name="module_bucket_policy"></a> [bucket\_policy](#module\_bucket\_policy) | cloudposse/iam-policy/aws | 2.0.2 |
 | <a name="module_cloudtrail"></a> [cloudtrail](#module\_cloudtrail) | cloudposse/cloudtrail/aws | 0.24.0 |
@@ -177,7 +164,7 @@ components:
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [aws_kms_alias.cloudtrail](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias) | resource |
 | [aws_kms_key.cloudtrail](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key) | resource |
 | [datadog_logs_archive.catchall_archive](https://registry.terraform.io/providers/datadog/datadog/latest/docs/resources/logs_archive) | resource |
@@ -193,12 +180,12 @@ components:
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_access_log_bucket_enabled"></a> [access\_log\_bucket\_enabled](#input\_access\_log\_bucket\_enabled) | Whether to create a dedicated S3 bucket for CloudTrail bucket access logs | `bool` | `false` | no |
 | <a name="input_access_log_bucket_name"></a> [access\_log\_bucket\_name](#input\_access\_log\_bucket\_name) | Name of existing S3 bucket to use for CloudTrail bucket access logs. Only used when access\_log\_bucket\_enabled is false | `string` | `""` | no |
 | <a name="input_additional_query_tags"></a> [additional\_query\_tags](#input\_additional\_query\_tags) | Additional tags to be used in the query for this archive | `list(any)` | `[]` | no |
 | <a name="input_additional_tag_map"></a> [additional\_tag\_map](#input\_additional\_tag\_map) | Additional key-value pairs to add to each map in `tags_as_list_of_maps`. Not added to `tags` or `id`.<br/>This is for some rare cases where resources want additional configuration of tags<br/>and therefore take a list of maps with tag key, value, and additional configuration. | `map(string)` | `{}` | no |
-| <a name="input_archive_lifecycle_config"></a> [archive\_lifecycle\_config](#input\_archive\_lifecycle\_config) | Lifecycle configuration for the archive S3 bucket | <pre>object({<br/>    abort_incomplete_multipart_upload_days         = optional(number, null)<br/>    enable_glacier_transition                      = optional(bool, true)<br/>    glacier_transition_days                        = optional(number, 365)<br/>    glacier_transition_storage_class               = optional(string, "GLACIER_IR")<br/>    noncurrent_version_glacier_transition_days     = optional(number, 30)<br/>    enable_deeparchive_transition                  = optional(bool, false)<br/>    deeparchive_transition_days                    = optional(number, 0)<br/>    noncurrent_version_deeparchive_transition_days = optional(number, 0)<br/>    enable_standard_ia_transition                  = optional(bool, false)<br/>    standard_transition_days                       = optional(number, 0)<br/>    expiration_days                                = optional(number, 0)<br/>    noncurrent_version_expiration_days             = optional(number, 0)<br/>  })</pre> | `{}` | no |
+| <a name="input_archive_lifecycle_config"></a> [archive\_lifecycle\_config](#input\_archive\_lifecycle\_config) | Lifecycle configuration for the archive S3 bucket | <pre>object({<br/>    abort_incomplete_multipart_upload_days         = optional(number, null)<br/>    enable_glacier_transition                      = optional(bool, true)<br/>    glacier_transition_days                        = optional(number, 365)<br/>    noncurrent_version_glacier_transition_days     = optional(number, 30)<br/>    enable_deeparchive_transition                  = optional(bool, false)<br/>    deeparchive_transition_days                    = optional(number, 0)<br/>    noncurrent_version_deeparchive_transition_days = optional(number, 0)<br/>    enable_standard_ia_transition                  = optional(bool, false)<br/>    standard_transition_days                       = optional(number, 0)<br/>    expiration_days                                = optional(number, 0)<br/>    noncurrent_version_expiration_days             = optional(number, 0)<br/>  })</pre> | `{}` | no |
 | <a name="input_archive_name"></a> [archive\_name](#input\_archive\_name) | Name of the Datadog logs archive. Datadog logs archive names must be unique within a Datadog organization, so this defaults to the globally unique module ID (`module.this.id`) when null. | `string` | `null` | no |
 | <a name="input_attributes"></a> [attributes](#input\_attributes) | ID element. Additional attributes (e.g. `workers` or `cluster`) to add to `id`,<br/>in the order they appear in the list. New attributes are appended to the<br/>end of the list. The elements of the list are joined by the `delimiter`<br/>and treated as a single ID element. | `list(string)` | `[]` | no |
 | <a name="input_catchall_archive_name"></a> [catchall\_archive\_name](#input\_catchall\_archive\_name) | Name of the catchall Datadog logs archive. Datadog logs archive names must be unique within a Datadog organization, so this defaults to `<module.this.id>-catchall` when null. | `string` | `null` | no |
@@ -209,7 +196,6 @@ components:
 | <a name="input_cloudtrail_kms_key_deletion_window_in_days"></a> [cloudtrail\_kms\_key\_deletion\_window\_in\_days](#input\_cloudtrail\_kms\_key\_deletion\_window\_in\_days) | Duration in days after which the KMS key is deleted after destruction of the resource, must be between 7 and 30 days | `number` | `10` | no |
 | <a name="input_cloudtrail_kms_key_enable_rotation"></a> [cloudtrail\_kms\_key\_enable\_rotation](#input\_cloudtrail\_kms\_key\_enable\_rotation) | Enable automatic rotation of the KMS key | `bool` | `true` | no |
 | <a name="input_cloudtrail_lifecycle_config"></a> [cloudtrail\_lifecycle\_config](#input\_cloudtrail\_lifecycle\_config) | Lifecycle configuration for the cloudtrail S3 bucket | <pre>object({<br/>    abort_incomplete_multipart_upload_days         = optional(number, null)<br/>    enable_glacier_transition                      = optional(bool, true)<br/>    glacier_transition_days                        = optional(number, 365)<br/>    noncurrent_version_glacier_transition_days     = optional(number, 365)<br/>    enable_deeparchive_transition                  = optional(bool, false)<br/>    deeparchive_transition_days                    = optional(number, 0)<br/>    noncurrent_version_deeparchive_transition_days = optional(number, 0)<br/>    enable_standard_ia_transition                  = optional(bool, false)<br/>    standard_transition_days                       = optional(number, 0)<br/>    expiration_days                                = optional(number, 0)<br/>    noncurrent_version_expiration_days             = optional(number, 0)<br/>  })</pre> | `{}` | no |
-| <a name="input_compression_method"></a> [compression\_method](#input\_compression\_method) | Compression method Datadog uses when writing objects to the archive. One of `ZSTD` or `GZIP`.<br/><br/>Defaults to `ZSTD`, which is the default and the recommendation in the Datadog console,<br/>especially where Archive Search is used. `ZSTD` objects are smaller than `GZIP`, so they cost<br/>less to store, less to scan (Archive Search and rehydration are both billed on the volume<br/>scanned) and less in egress from the archive bucket. The Datadog provider defaults to `GZIP`. | `string` | `"ZSTD"` | no |
 | <a name="input_context"></a> [context](#input\_context) | Single object for setting entire context at once.<br/>See description of individual variables for details.<br/>Leave string and numeric variables as `null` to use default value.<br/>Individual variable settings (non-null) override settings in context object,<br/>except for attributes, tags, and additional\_tag\_map, which are merged. | `any` | <pre>{<br/>  "additional_tag_map": {},<br/>  "attributes": [],<br/>  "delimiter": null,<br/>  "descriptor_formats": {},<br/>  "enabled": true,<br/>  "environment": null,<br/>  "id_length_limit": null,<br/>  "label_key_case": null,<br/>  "label_order": [],<br/>  "label_value_case": null,<br/>  "labels_as_tags": [<br/>    "unset"<br/>  ],<br/>  "name": null,<br/>  "namespace": null,<br/>  "regex_replace_chars": null,<br/>  "stage": null,<br/>  "tags": {},<br/>  "tenant": null<br/>}</pre> | no |
 | <a name="input_delimiter"></a> [delimiter](#input\_delimiter) | Delimiter to be used between ID elements.<br/>Defaults to `-` (hyphen). Set to `""` to use no delimiter at all. | `string` | `null` | no |
 | <a name="input_descriptor_formats"></a> [descriptor\_formats](#input\_descriptor\_formats) | Describe additional descriptors to be output in the `descriptors` output map.<br/>Map of maps. Keys are names of descriptors. Values are maps of the form<br/>`{<br/>  format = string<br/>  labels = list(string)<br/>}`<br/>(Type is `any` so the map values can later be enhanced to provide additional options.)<br/>`format` is a Terraform format string to be passed to the `format()` function.<br/>`labels` is a list of labels, in order, to pass to `format()` function.<br/>Label values will be normalized before being passed to `format()` so they will be<br/>identical to how they appear in `id`.<br/>Default is `{}` (`descriptors` output will be empty). | `any` | `{}` | no |
@@ -221,18 +207,15 @@ components:
 | <a name="input_label_value_case"></a> [label\_value\_case](#input\_label\_value\_case) | Controls the letter case of ID elements (labels) as included in `id`,<br/>set as tag values, and output by this module individually.<br/>Does not affect values of tags passed in via the `tags` input.<br/>Possible values: `lower`, `title`, `upper` and `none` (no transformation).<br/>Set this to `title` and set `delimiter` to `""` to yield Pascal Case IDs.<br/>Default value: `lower`. | `string` | `null` | no |
 | <a name="input_labels_as_tags"></a> [labels\_as\_tags](#input\_labels\_as\_tags) | Set of labels (ID elements) to include as tags in the `tags` output.<br/>Default is to include all labels.<br/>Tags with empty values will not be included in the `tags` output.<br/>Set to `[]` to suppress all generated tags.<br/>**Notes:**<br/>  The value of the `name` tag, if included, will be the `id`, not the `name`.<br/>  Unlike other `null-label` inputs, the initial setting of `labels_as_tags` cannot be<br/>  changed in later chained modules. Attempts to change it will be silently ignored. | `set(string)` | <pre>[<br/>  "default"<br/>]</pre> | no |
 | <a name="input_lifecycle_rules_enabled"></a> [lifecycle\_rules\_enabled](#input\_lifecycle\_rules\_enabled) | Enable/disable lifecycle management rules for log archive s3 objects | `bool` | `true` | no |
-| <a name="input_lookup_attributes"></a> [lookup\_attributes](#input\_lookup\_attributes) | Up to two high cardinality attributes (trace ID, container ID, user ID) used to pinpoint<br/>individual logs within a data block, reducing both the volume scanned and egress from the<br/>archive bucket.<br/><br/>Only logs archived after this is set benefit. Null disables lookup acceleration. | `list(string)` | `null` | no |
 | <a name="input_name"></a> [name](#input\_name) | ID element. Usually the component or solution name, e.g. 'app' or 'jenkins'.<br/>This is the only ID element not also included as a `tag`.<br/>The "name" tag is set to the full `id` string. There is no tag with the value of the `name` input. | `string` | `null` | no |
 | <a name="input_namespace"></a> [namespace](#input\_namespace) | ID element. Usually an abbreviation of your organization name, e.g. 'eg' or 'cp', to help ensure generated IDs are globally unique | `string` | `null` | no |
 | <a name="input_object_lock_days_archive"></a> [object\_lock\_days\_archive](#input\_object\_lock\_days\_archive) | Object lock duration for archive buckets in days | `number` | `7` | no |
 | <a name="input_object_lock_days_cloudtrail"></a> [object\_lock\_days\_cloudtrail](#input\_object\_lock\_days\_cloudtrail) | Object lock duration for cloudtrail buckets in days | `number` | `7` | no |
 | <a name="input_object_lock_mode_archive"></a> [object\_lock\_mode\_archive](#input\_object\_lock\_mode\_archive) | Object lock mode for archive bucket. Possible values are COMPLIANCE or GOVERNANCE | `string` | `"COMPLIANCE"` | no |
 | <a name="input_object_lock_mode_cloudtrail"></a> [object\_lock\_mode\_cloudtrail](#input\_object\_lock\_mode\_cloudtrail) | Object lock mode for cloudtrail bucket. Possible values are COMPLIANCE or GOVERNANCE | `string` | `"COMPLIANCE"` | no |
-| <a name="input_partitioning_attributes"></a> [partitioning\_attributes](#input\_partitioning\_attributes) | Up to two low cardinality attributes used as partition keys for the archive, most frequently<br/>queried first. Logs sharing a partition value are co-located, so a search can skip partitions<br/>that cannot match before downloading them.<br/><br/>This is the only setting that decouples scan size from the length of the searched time range.<br/>The query filter is applied after the matching files are downloaded, so an unpartitioned<br/>archive scans the whole window regardless of how selective the query is.<br/><br/>Only logs archived after this is set are partitioned. Null leaves the archive unpartitioned. | `list(string)` | `null` | no |
 | <a name="input_query_override"></a> [query\_override](#input\_query\_override) | Override query for datadog archive. If null would be used query 'env:{stage} OR account:{aws account id} OR {additional\_query\_tags}' | `string` | `null` | no |
 | <a name="input_regex_replace_chars"></a> [regex\_replace\_chars](#input\_regex\_replace\_chars) | Terraform regular expression (regex) string.<br/>Characters matching the regex will be removed from the ID elements.<br/>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
 | <a name="input_region"></a> [region](#input\_region) | AWS Region | `string` | n/a | yes |
-| <a name="input_rehydration_max_scan_size_in_gb"></a> [rehydration\_max\_scan\_size\_in\_gb](#input\_rehydration\_max\_scan\_size\_in\_gb) | Maximum volume, in GB, that a single job may scan against this archive.<br/><br/>Despite the field name, which predates Archive Search, this is one per-archive setting that<br/>caps Archive Search queries and rehydration jobs alike. Null means no limit, so a single wide<br/>search can scan the entire archive and bill the corresponding egress. | `number` | `null` | no |
 | <a name="input_s3_force_destroy"></a> [s3\_force\_destroy](#input\_s3\_force\_destroy) | Set to true to delete non-empty buckets when enabled is set to false | `bool` | `false` | no |
 | <a name="input_stage"></a> [stage](#input\_stage) | ID element. Usually used to indicate role, e.g. 'prod', 'staging', 'source', 'build', 'test', 'deploy', 'release' | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Additional tags (e.g. `{'BusinessUnit': 'XYZ'}`).<br/>Neither the tag keys nor the tag values will be modified by this module. | `map(string)` | `{}` | no |
@@ -241,7 +224,7 @@ components:
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_access_log_bucket_arn"></a> [access\_log\_bucket\_arn](#output\_access\_log\_bucket\_arn) | The ARN of the bucket used for CloudTrail bucket access logs |
 | <a name="output_access_log_bucket_domain_name"></a> [access\_log\_bucket\_domain\_name](#output\_access\_log\_bucket\_domain\_name) | The FQDN of the bucket used for CloudTrail bucket access logs |
 | <a name="output_access_log_bucket_id"></a> [access\_log\_bucket\_id](#output\_access\_log\_bucket\_id) | The ID (name) of the bucket used for CloudTrail bucket access logs |
