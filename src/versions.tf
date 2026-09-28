@@ -1,5 +1,9 @@
 terraform {
-  required_version = ">= 0.13.0"
+  # The variable `nullable` argument used in variables.tf requires Terraform 1.1, and the
+  # Datadog provider has required Terraform 1.1.5 since its 4.0.0 release, so the floor below
+  # is already enforced transitively by the provider constraint rather than being a new
+  # restriction. Declaring 0.13.0 was inaccurate for a configuration that cannot run on it.
+  required_version = ">= 1.1.5"
 
   required_providers {
     aws = {
