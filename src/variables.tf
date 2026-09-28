@@ -36,6 +36,77 @@ variable "catchall_archive_name" {
   default     = null
 }
 
+variable "compression_method" {
+  type        = string
+  description = <<-EOT
+    Compression method Datadog uses when writing objects to the archive. One of `ZSTD` or `GZIP`.
+
+    Defaults to `ZSTD`, which is the default and the recommendation in the Datadog console,
+    especially where Archive Search is used. `ZSTD` objects are smaller than `GZIP`, so they cost
+    less to store, less to scan (Archive Search and rehydration are both billed on the volume
+    scanned) and less in egress from the archive bucket. The Datadog provider defaults to `GZIP`.
+  EOT
+  default     = "ZSTD"
+
+  validation {
+    condition     = contains(["ZSTD", "GZIP"], var.compression_method)
+    error_message = "compression_method must be ZSTD or GZIP."
+  }
+}
+
+variable "partitioning_attributes" {
+  type        = list(string)
+  nullable    = true
+  description = <<-EOT
+    Up to two low cardinality attributes used as partition keys for the archive, most frequently
+    queried first. Logs sharing a partition value are co-located, so a search can skip partitions
+    that cannot match before downloading them.
+
+    This is the only setting that decouples scan size from the length of the searched time range.
+    The query filter is applied after the matching files are downloaded, so an unpartitioned
+    archive scans the whole window regardless of how selective the query is.
+
+    Only logs archived after this is set are partitioned. Null leaves the archive unpartitioned.
+  EOT
+  default     = null
+
+  validation {
+    condition     = var.partitioning_attributes == null ? true : length(var.partitioning_attributes) <= 2
+    error_message = "Datadog allows at most 2 partitioning attributes per archive."
+  }
+}
+
+variable "lookup_attributes" {
+  type        = list(string)
+  nullable    = true
+  description = <<-EOT
+    Up to two high cardinality attributes (trace ID, container ID, user ID) used to pinpoint
+    individual logs within a data block, reducing both the volume scanned and egress from the
+    archive bucket.
+
+    Only logs archived after this is set benefit. Null disables lookup acceleration.
+  EOT
+  default     = null
+
+  validation {
+    condition     = var.lookup_attributes == null ? true : length(var.lookup_attributes) <= 2
+    error_message = "Datadog allows at most 2 lookup attributes per archive."
+  }
+}
+
+variable "rehydration_max_scan_size_in_gb" {
+  type        = number
+  nullable    = true
+  description = <<-EOT
+    Maximum volume, in GB, that a single job may scan against this archive.
+
+    Despite the field name, which predates Archive Search, this is one per-archive setting that
+    caps Archive Search queries and rehydration jobs alike. Null means no limit, so a single wide
+    search can scan the entire archive and bill the corresponding egress.
+  EOT
+  default     = null
+}
+
 variable "lifecycle_rules_enabled" {
   type        = bool
   description = "Enable/disable lifecycle management rules for log archive s3 objects"

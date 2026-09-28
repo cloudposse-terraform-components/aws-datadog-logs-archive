@@ -448,6 +448,11 @@ resource "datadog_logs_archive" "logs_archive" {
   rehydration_tags = ["rehydrated:true"]
   query            = local.query
 
+  compression_method              = var.compression_method
+  partitioning_attributes         = var.partitioning_attributes
+  lookup_attributes               = var.lookup_attributes
+  rehydration_max_scan_size_in_gb = var.rehydration_max_scan_size_in_gb
+
   s3_archive {
     bucket     = module.archive_bucket[0].bucket_id
     path       = "/"
@@ -464,6 +469,11 @@ resource "datadog_logs_archive" "catchall_archive" {
   include_tags     = true
   rehydration_tags = ["rehydrated:true"]
   query            = "*"
+
+  compression_method              = var.compression_method
+  partitioning_attributes         = var.partitioning_attributes
+  lookup_attributes               = var.lookup_attributes
+  rehydration_max_scan_size_in_gb = var.rehydration_max_scan_size_in_gb
 
   s3_archive {
     bucket     = module.archive_bucket[0].bucket_id
