@@ -34,6 +34,19 @@ description: |-
 
   The created KMS key includes the required policy statements for CloudTrail to encrypt logs and for authorized principals to decrypt them.
 
+  ## Archive Tuning
+
+  Four settings control how Datadog writes the archive and how much a search or rehydration is allowed to read back:
+
+  - `compression_method` (default: `ZSTD`) - Compression Datadog uses when writing objects, either `ZSTD` or `GZIP`. `ZSTD` is the default and the recommendation in the Datadog console, especially where Archive Search is used: the objects are smaller, so they cost less to store, less to scan, and less in egress from the archive bucket. Note the Datadog provider itself defaults to `GZIP`.
+  - `partitioning_attributes` (default: `null`) - Up to two low cardinality attributes used as partition keys, most frequently queried first. Logs sharing a partition value are co-located, so a search can skip partitions that cannot match before downloading them.
+  - `lookup_attributes` (default: `null`) - Up to two high cardinality attributes, such as a trace, container or user ID, used to pinpoint individual logs within a data block.
+  - `rehydration_max_scan_size_in_gb` (default: `null`) - Maximum volume, in GB, that a single job may scan against this archive. Despite the field name, which predates Archive Search, this one setting caps Archive Search queries and rehydration jobs alike. Left unset, a single wide search can scan the entire archive.
+
+  Partitioning is worth more than it first appears. Datadog applies the query filter after the matching files are downloaded, so scan size is driven by the length of the searched time range rather than by how selective the query is: a narrow filter over a wide window still scans the whole window. Partition attributes are the only mechanism that prunes files before download.
+
+  All four are forward-only. Only logs archived after the setting is applied are affected, and objects already written cannot be retrofitted. Changing `compression_method` on an existing archive only affects new files; objects already stored keep their original format and stay readable, since the two formats use different extensions.
+
   ## Sponsorship
 
   <picture>
