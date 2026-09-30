@@ -10,6 +10,27 @@ variable "query_override" {
   default     = null
 }
 
+variable "query_exclusions" {
+  type        = list(string)
+  nullable    = true
+  description = <<-EOT
+    Query fragments to subtract from the archive query, combined as
+    `(<query>) -(<fragment> OR <fragment> ...)`.
+
+    Unlike `query_override`, this keeps the derived query intact, including the AWS account id that
+    is only known at apply time, so an archive can drop a class of logs without the caller having to
+    restate the whole query. Unlike `additional_query_tags`, which appends with OR, these fragments
+    are negated as a group.
+
+    Logs matching a fragment are still ingested and still visible in Live Tail; they are only kept
+    out of the archive. Pair this with an index exclusion filter to keep them out of the index too,
+    since exclusion filters on their own do not stop archiving.
+
+    Null or empty leaves the query untouched.
+  EOT
+  default     = null
+}
+
 variable "archive_name" {
   type        = string
   nullable    = true

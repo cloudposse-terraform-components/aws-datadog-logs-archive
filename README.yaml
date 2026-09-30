@@ -51,6 +51,22 @@ description: |-
 
   These settings require the Datadog provider `>= 4.13.0`, the first release carrying all four attributes.
 
+  ## Excluding Logs From the Archive
+
+  `query_exclusions` subtracts from the archive query, producing `(<query>) -(<fragment> OR <fragment> ...)`.
+
+  It exists because neither existing input can express "archive everything except this". `query_override` replaces the whole query, including the AWS account id that is only resolved at apply time, so using it to add a negation means restating the query and hardcoding the account id. `additional_query_tags` appends with `OR`, where a negation matches nearly everything.
+
+  ```yaml
+  query_exclusions:
+    - '@http.useragent:"ELB-HealthChecker/2.0"'
+    - '@http.url_details.path:("/health" OR "/ready" OR "/livez")'
+  ```
+
+  Worth knowing: **index exclusion filters do not stop archiving.** Per the Datadog documentation, excluded logs are discarded from indexes but still flow through Live Tail and are still archived. So health checks and similar high volume, low value traffic can be filtered out of the index and still fill the bucket. Combining an index exclusion filter with the matching `query_exclusions` fragment leaves that traffic visible in Live Tail for real time debugging while keeping it out of both the index and the archive.
+
+  Be deliberate about what goes in here. Dropping probe traffic is a cost decision; dropping audit logs such as CloudTrail or Kubernetes audit events is a compliance decision, and once a log is neither indexed nor archived nothing retains it.
+
   ## Sponsorship
 
   <picture>
