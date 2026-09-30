@@ -26,7 +26,11 @@ variable "query_exclusions" {
     out of the archive. Pair this with an index exclusion filter to keep them out of the index too,
     since exclusion filters on their own do not stop archiving.
 
-    Null or empty leaves the query untouched.
+    Applies to the catchall archive as well when `catchall_enabled` is true. Without that, an
+    excluded log would match the catchall query `*` and be written to the same bucket under
+    `/catchall`.
+
+    Null or empty leaves both queries untouched.
   EOT
   default     = null
 }

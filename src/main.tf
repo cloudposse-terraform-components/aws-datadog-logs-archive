@@ -87,7 +87,14 @@ locals {
   # Neither existing input can express "archive everything except this": `query_override` replaces
   # the whole query, including the account id that is only resolved at apply time, and
   # `additional_query_tags` appends with OR, where a negation matches nearly everything.
-  query = length(coalesce(var.query_exclusions, [])) == 0 ? local.base_query : "(${local.base_query}) -(${join(" OR ", var.query_exclusions)})"
+  #
+  # The suffix is applied to the catchall archive as well. Its query is `*`, so without this an
+  # excluded log would simply be picked up by the catchall and written to the same bucket under
+  # `/catchall`, and the exclusion would not do what it says. Empty exclusions leave both queries
+  # byte for byte as they were.
+  query_exclusion_suffix = length(coalesce(var.query_exclusions, [])) == 0 ? "" : " -(${join(" OR ", var.query_exclusions)})"
+  query                  = local.query_exclusion_suffix == "" ? local.base_query : "(${local.base_query})${local.query_exclusion_suffix}"
+  catchall_query         = local.query_exclusion_suffix == "" ? "*" : "(*)${local.query_exclusion_suffix}"
 
   # CloudTrail KMS key ARN selection
   cloudtrail_kms_key_arn = (
@@ -474,7 +481,7 @@ resource "datadog_logs_archive" "catchall_archive" {
   name             = local.catchall_archive_name
   include_tags     = true
   rehydration_tags = ["rehydrated:true"]
-  query            = "*"
+  query            = local.catchall_query
 
   compression_method              = var.compression_method
   partitioning_attributes         = var.partitioning_attributes
