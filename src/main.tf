@@ -422,7 +422,7 @@ module "cloudtrail" {
   # happens to be attempted prior to completion of the policy attachment.
   depends_on = [module.cloudtrail_s3_bucket, aws_kms_key.cloudtrail]
   source     = "cloudposse/cloudtrail/aws"
-  version    = "0.24.0"
+  version    = "0.25.0"
 
   enable_log_file_validation    = true
   include_global_service_events = false
